@@ -187,7 +187,7 @@ export default function Experience() {
     const form = document.getElementById("rform");
     const onSubmit = (e) => {
       e.preventDefault();
-      const rec = { n: document.getElementById("fn").value, p: document.getElementById("ph").value, d: document.getElementById("dy").value, c: document.getElementById("ch").value, t: Date.now() };
+      const chEl = document.getElementById("ch"); const rec = { n: document.getElementById("fn").value, p: document.getElementById("ph").value, d: document.getElementById("dy").value, c: chEl ? chEl.value : "", t: Date.now() };
       try { const reg = JSON.parse(localStorage.getItem("ff_reg") || "[]"); reg.push(rec); localStorage.setItem("ff_reg", JSON.stringify(reg)); } catch (x) {}
       form.style.display = "none";
       const ok = document.getElementById("regok"); if (ok) ok.style.display = "block";
@@ -246,7 +246,7 @@ export default function Experience() {
       </div>
 
       <div className="hero" id="top">
-        <div id="hbg" className="hbg" style={{ backgroundImage: "url(img/night_backlight_b.jpg)" }} />
+        <div id="hbg" className="hbg" style={{ backgroundImage: "url(img/hero_night_a.jpg)" }} />
         <div className="hveil" />
         <canvas id="embers" className="embers" aria-hidden="true" />
         <div className="hin">
@@ -301,7 +301,7 @@ export default function Experience() {
       </section>
 
       <div className="quote">
-        <div className="bg" style={{ backgroundImage: "url(img/night_backlight_b.jpg)" }} />
+        <div className="bg" style={{ backgroundImage: "url(img/hero_night_a.jpg)" }} />
         <div className="qin reveal">
           <p className="eyebrow">The word over the city</p>
           <p className="qbig" style={{ marginTop: 22 }}>&ldquo;We have <em>taken</em> this city&rdquo;</p>
@@ -428,7 +428,6 @@ export default function Experience() {
                 </select>
               </div>
             </div>
-            <label htmlFor="ch">Church / campus fellowship (optional)</label><input id="ch" name="ch" placeholder="Where you worship" />
             <button type="submit">Reserve my seat</button>
           </form>
           <div id="regok" className="regok">
