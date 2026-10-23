@@ -32,7 +32,7 @@ const GAL = [
 const NIGHTS = [
   ["Night I", "Sun 6 Dec", "Opening Night", "The gates open. Worship goes up, the word comes down, and the 9th edition is declared burning.", "img/preacher_truss.jpg"],
   ["Night II", "Mon 7 Dec", "The Fire Altars", "Prophetic prayer lines and altar calls. Come with your point of contact; leave with your testimony.", "img/night_crowd_wide.jpg"],
-  ["Night III", "Tue 8 Dec", "Commissioning", "The final charge. Watchmen are sent out from Abraka to the ends of the earth.", "img/art_daytime.jpg"],
+  ["Night III", "Tue 8 Dec", "Commissioning", "The final charge. The watchmen are sent out with fire in their bones.", "img/art_daytime.jpg"],
 ];
 
 export default function Experience() {
