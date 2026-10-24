@@ -248,6 +248,46 @@ export default function Experience() {
       </div>
 
 
+      <section className="reg" id="register">
+        <div className="rt reveal">
+          <p className="eyebrow">Free entry &middot; 4:30 PM daily</p>
+          <h2>Reserve your <em>seat at the fire</em></h2>
+          <p className="lead">Seats on the ground are open to everyone, but a reservation keeps you on the list for the nightly countdown flyers from the Watchmen, and first notice when the guest ministers are announced.</p>
+        </div>
+        <div className="card reveal">
+          <form id="rform" noValidate={false}>
+            <label htmlFor="fn">Full name</label><input id="fn" name="fn" required placeholder="Your full name" />
+            <div className="row">
+              <div><label htmlFor="ph">Phone (WhatsApp)</label><input id="ph" name="ph" required type="tel" placeholder="0801 234 5678" /></div>
+              <div><label htmlFor="dy">Night(s)</label>
+                <select id="dy" name="dy">
+                  <option>All three nights</option><option>Sun 6 &middot; Opening</option>
+                  <option>Mon 7 &middot; Fire Altars</option><option>Tue 8 &middot; Commissioning</option>
+                </select>
+              </div>
+            </div>
+            <button type="submit">Reserve my seat</button>
+          </form>
+          <div id="regok" className="regok">
+            <img src="img/logo_mark.jpg" alt="" />
+            <h3>Your seat is lit.</h3>
+            <p>Reservation noted on this device. To make sure the team&rsquo;s desk has it, send it over in one tap:</p>
+            <a id="regwa" className="ibtn solid" style={{ display: "inline-block", width: "auto", padding: "14px 28px", marginTop: 14 }} target="_blank" rel="noopener" rel="noopener noreferrer">Send on WhatsApp</a>
+          </div>
+        </div>
+      </section>
+
+      <section className="pad" id="testimony" style={{ paddingTop: 20 }}>
+        <div className="shead reveal">
+          <p className="eyebrow">Give God the praise</p>
+          <h2>Share your <em>testimony</em></h2>
+          <p className="slead">What He did for you is someone else&rsquo;s strength on the ground. Send it to the Watchmen and let them carry it.</p>
+        </div>
+        <div style={{ maxWidth: 640, margin: "0 auto" }}>
+          <Testimony />
+        </div>
+      </section>
+
       <div className="quote">
         <div className="bg" style={{ backgroundImage: "url(img/hero_night_a.jpg)" }} />
         <div className="qin reveal">
@@ -350,17 +390,6 @@ export default function Experience() {
         </div>
       </section>
 
-      <section className="pad" id="testimony" style={{ paddingTop: 20 }}>
-        <div className="shead reveal">
-          <p className="eyebrow">Give God the praise</p>
-          <h2>Share your <em>testimony</em></h2>
-          <p className="slead">What He did for you is someone else&rsquo;s strength on the ground. Send it to the Watchmen and let them carry it.</p>
-        </div>
-        <div style={{ maxWidth: 640, margin: "0 auto" }}>
-          <Testimony />
-        </div>
-      </section>
-
       <div className="quote" style={{ minHeight: "60vh" }}>
         <div className="bg" style={{ backgroundImage: "url(img/crowd_laser.jpg)" }} />
         <div className="qin reveal">
@@ -368,35 +397,6 @@ export default function Experience() {
           <div id="cd2" className="cdown" style={{ marginTop: 30 }} />
         </div>
       </div>
-
-      <section className="reg" id="register">
-        <div className="rt reveal">
-          <p className="eyebrow">Free entry &middot; 4:30 PM daily</p>
-          <h2>Reserve your <em>seat at the fire</em></h2>
-          <p className="lead">Seats on the ground are open to everyone, but a reservation keeps you on the list for the nightly countdown flyers from the Watchmen, and first notice when the guest ministers are announced.</p>
-        </div>
-        <div className="card reveal">
-          <form id="rform" noValidate={false}>
-            <label htmlFor="fn">Full name</label><input id="fn" name="fn" required placeholder="Your full name" />
-            <div className="row">
-              <div><label htmlFor="ph">Phone (WhatsApp)</label><input id="ph" name="ph" required type="tel" placeholder="0801 234 5678" /></div>
-              <div><label htmlFor="dy">Night(s)</label>
-                <select id="dy" name="dy">
-                  <option>All three nights</option><option>Sun 6 &middot; Opening</option>
-                  <option>Mon 7 &middot; Fire Altars</option><option>Tue 8 &middot; Commissioning</option>
-                </select>
-              </div>
-            </div>
-            <button type="submit">Reserve my seat</button>
-          </form>
-          <div id="regok" className="regok">
-            <img src="img/logo_mark.jpg" alt="" />
-            <h3>Your seat is lit.</h3>
-            <p>Reservation noted on this device. To make sure the team&rsquo;s desk has it, send it over in one tap:</p>
-            <a id="regwa" className="ibtn solid" style={{ display: "inline-block", width: "auto", padding: "14px 28px", marginTop: 14 }} target="_blank" rel="noopener" rel="noopener noreferrer">Send on WhatsApp</a>
-          </div>
-        </div>
-      </section>
 
       <footer className="footer">
         <img src="img/logo_mark.jpg" alt="The Watchmen Prayer Network International logo" />
