@@ -96,7 +96,7 @@ export default function Experience() {
     let raf; let running = true; let rs = null;
     if (cv && !RM) {
       const cx = cv.getContext("2d");
-      const N = Math.max(30, Math.min(70, Math.round(innerWidth / 14)));
+      const N = Math.max(22, Math.min(70, Math.round(innerWidth / (innerWidth < 760 ? 26 : 14))));
       let ps = [], mx = 0.5;
       for (let i = 0; i < N; i++) ps.push({ x: Math.random(), y: Math.random(), r: Math.random() * 2 + 0.5, s: Math.random() * 0.3 + 0.1, w: Math.random() * 6.28, a: Math.random() * 0.5 + 0.2 });
       rs = () => { cv.width = innerWidth; cv.height = innerHeight; }; rs();
@@ -291,7 +291,7 @@ export default function Experience() {
                   <div className="jtheme">{s.theme}{s.now ? <span style={{ color: "var(--gold)" }}> &middot; you are here</span> : null}</div>
                   <div className="jline">{s.line}</div>
                 </div>
-                {s.img ? <div className="jframe"><img src={s.img} alt={"DELSU Prays " + s.year + " flyer"} /></div> : null}
+                {s.img ? <div className="jframe"><img src={s.img} alt={"DELSU Prays " + s.year + " flyer"} loading="lazy" decoding="async" /></div> : null}
               </div>
             </div>
           ))}
@@ -367,7 +367,7 @@ export default function Experience() {
               <p className="ldot"><i />No broadcast yet</p>
               <h3>The stream will appear here</h3>
               <p>When a verified broadcast goes live, it plays right on this page. Until then, daily countdown flyers and official announcements land on the Telegram channel first.</p>
-              <a className="btn line" href={SITE.telegram} target="_blank" rel="noopener noreferrer" style={{ marginTop: 24 }}>Join the Telegram channel</a>
+              <a className="btn line" href={SITE.telegram} target="_blank" rel="noopener" rel="noopener noreferrer" style={{ marginTop: 24 }}>Join the Telegram channel</a>
             </>
           )}
         </div>
@@ -384,7 +384,7 @@ export default function Experience() {
             {SITE.venue.landmarks.map((m, i) => <span key={i}>{m}</span>)}
           </div>
           <div className="vbtns">
-            <a className="btn gold" href={MAPS} target="_blank" rel="noopener noreferrer">Get directions</a>
+            <a className="btn gold" href={MAPS} target="_blank" rel="noopener" rel="noopener noreferrer">Get directions</a>
             <button type="button" className="btn line" data-copy={ADDR} style={{ background: "none", cursor: "pointer" }}>Copy address</button>
           </div>
           <p className="vnote">Coming from DELSU? Head toward Olori 19 Road and ask for Ese-G Hostel; the ground is directly behind it, opposite Gospel Stars Church.</p>
@@ -434,7 +434,7 @@ export default function Experience() {
             <img src="img/logo_mark.jpg" alt="" />
             <h3>Your seat is lit.</h3>
             <p>Reservation noted on this device. To make sure the team&rsquo;s desk has it, send it over in one tap:</p>
-            <a id="regwa" className="ibtn solid" style={{ display: "inline-block", width: "auto", padding: "14px 28px", marginTop: 14 }} target="_blank" rel="noopener noreferrer">Send on WhatsApp</a>
+            <a id="regwa" className="ibtn solid" style={{ display: "inline-block", width: "auto", padding: "14px 28px", marginTop: 14 }} target="_blank" rel="noopener" rel="noopener noreferrer">Send on WhatsApp</a>
           </div>
         </div>
       </section>
