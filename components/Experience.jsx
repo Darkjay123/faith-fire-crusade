@@ -3,6 +3,7 @@ import { useEffect } from "react";
 import { SITE } from "../lib/config";
 import Invite from "./Invite";
 import Prayer from "./Prayer";
+import Testimony from "./Testimony";
 
 
 const GAL = [
@@ -192,6 +193,8 @@ export default function Experience() {
         </a>
         <nav className="nav" aria-label="Main">
           <a href="#nights">Three Nights</a>
+        <a href="#testimony">Testimony</a>
+          <a href="#testimony">Testimony</a>
           <a href="#invite">Invite</a>
           <a href="#venue">Venue</a>
           <a href="#prayer">Prayer</a>
@@ -203,6 +206,7 @@ export default function Experience() {
       <div id="mnav" className="mnav" role="dialog" aria-label="Menu">
         <p className="msm">Faith &amp; Fire Crusade &rsquo;26</p>
         <a href="#nights">Three Nights</a>
+        <a href="#testimony">Testimony</a>
         <a href="#invite">Invite a Friend</a>
         <a href="#live">Updates</a>
         <a href="#venue">Venue</a>
@@ -343,6 +347,17 @@ export default function Experience() {
         </div>
         <div style={{ maxWidth: 640, margin: "0 auto" }}>
           <Prayer />
+        </div>
+      </section>
+
+      <section className="pad" id="testimony" style={{ paddingTop: 20 }}>
+        <div className="shead reveal">
+          <p className="eyebrow">Give God the praise</p>
+          <h2>Share your <em>testimony</em></h2>
+          <p className="slead">What He did for you is someone else&rsquo;s strength on the ground. Send it to the Watchmen and let them carry it.</p>
+        </div>
+        <div style={{ maxWidth: 640, margin: "0 auto" }}>
+          <Testimony />
         </div>
       </section>
 
