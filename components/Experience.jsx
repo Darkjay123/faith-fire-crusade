@@ -4,23 +4,6 @@ import { SITE } from "../lib/config";
 import Invite from "./Invite";
 import Prayer from "./Prayer";
 
-const SLIDES = [
-  { year: "2018", theme: "The Beginning",
-    line: "It started with one altar and a field of students. No lights, no stage, just a cry: if God can burn in one campus, He can burn in a nation.",
-    bg: "img/night_stage_lights.jpg", img: null },
-  { year: "2021", theme: "Prophecy",
-    line: "An apostolic and prophetic prayer conference. The ground learned to hear the word of the Lord and declare it back to Him, night after night.",
-    bg: "img/night_backlight_a.jpg", img: null },
-  { year: "2022", theme: "The Burning Ones",
-    line: "A generation set alight. The crowd outgrew the ground, and the fire stopped being an event. It became an identity.",
-    bg: "img/crowd_laser.jpg", img: null },
-  { year: "2025", theme: "Inheritance Of Faith Possibilities",
-    line: "With Rev. Kolawole Williams Ogoigbe as guest minister. The watchmen inherited the promise: what faith can see, faith can hold.",
-    bg: "img/art_flyer2025.jpg", img: "img/art_flyer2025.jpg" },
-  { year: "2026", theme: "Faith & Fire",
-    line: "The 9th edition. December 6th to 8th, the same ground, a bigger fire. This is the chapter you get to stand in.",
-    bg: "img/flyer2026.jpg", img: null, now: true },
-];
 
 const GAL = [
   ["crowd_laser.jpg", "Light beams over the crowd at a night session", "s-a"],
@@ -145,24 +128,8 @@ export default function Experience() {
       if (pr) pr.style.width = (y / (document.body.scrollHeight - innerHeight) * 100) + "%";
       if (hd) { hd.classList.toggle("solid", y > 60); hd.classList.toggle("hide", y > lastY && y > 420); }
       lastY = y;
-      const jEl = document.getElementById("journey");
-      if (jEl) {
-        const r = jEl.getBoundingClientRect();
-        const p = Math.min(Math.max(-r.top / (r.height - innerHeight), 0), 0.999);
-        const idx = Math.floor(p * SLIDES.length);
-        if (String(idx) !== jEl.dataset.idx) {
-          jEl.dataset.idx = String(idx);
-          document.querySelectorAll(".jslide").forEach((s, i) => s.classList.toggle("on", i === idx));
-          document.querySelectorAll("#jdots i").forEach((dd, i) => dd.classList.toggle("on", i === idx));
-        }
-      }
     };
     addEventListener("scroll", sc, { passive: true });
-    document.querySelectorAll("#jdots i").forEach((d, i) => d.addEventListener("click", () => {
-      const jEl = document.getElementById("journey"); if (!jEl) return;
-      const r = jEl.getBoundingClientRect();
-      scrollTo({ top: scrollY + r.top + (r.height - innerHeight) * (i / SLIDES.length) + 2, behavior: RM ? "auto" : "smooth" });
-    }));
     sc();
 
     const items = [].slice.call(document.querySelectorAll(".gi img"));
@@ -224,7 +191,6 @@ export default function Experience() {
           <span className="t"><b>Faith &amp; Fire &rsquo;26</b>The Watchmen Prayer Network</span>
         </a>
         <nav className="nav" aria-label="Main">
-          <a href="#journey">The Journey</a>
           <a href="#nights">Three Nights</a>
           <a href="#invite">Invite</a>
           <a href="#venue">Venue</a>
@@ -236,7 +202,6 @@ export default function Experience() {
 
       <div id="mnav" className="mnav" role="dialog" aria-label="Menu">
         <p className="msm">Faith &amp; Fire Crusade &rsquo;26</p>
-        <a href="#journey">The Journey</a>
         <a href="#nights">Three Nights</a>
         <a href="#invite">Invite a Friend</a>
         <a href="#live">Updates</a>
@@ -263,7 +228,7 @@ export default function Experience() {
           <p className="sr">Counting down to Sunday, December 6, 2026, 4:30 PM West Africa Time, Crusade Ground, Abraka.</p>
           <div className="cta">
             <a className="btn gold" href="#register">I&rsquo;m Coming</a>
-            <a className="btn line" href="#journey">Explore the Crusade</a>
+            <a className="btn line" href="#nights">Explore the Crusade</a>
           </div>
         </div>
         <div className="scrollhint">Scroll</div>
@@ -278,27 +243,6 @@ export default function Experience() {
         <span>{SITE.name}&nbsp;&nbsp;&middot;&nbsp;&nbsp;{SITE.edition}&nbsp;&nbsp;&middot;&nbsp;&nbsp;December 6th &ndash; 8th, 2026&nbsp;&nbsp;&middot;&nbsp;&nbsp;4:30 PM Daily&nbsp;&nbsp;&middot;&nbsp;&nbsp;Free Entry&nbsp;&nbsp;&middot;&nbsp;&nbsp;DELSU Prays&nbsp;&nbsp;&middot;&nbsp;&nbsp;Abraka, Delta State&nbsp;&nbsp;&middot;&nbsp;&nbsp;{SITE.name}&nbsp;&nbsp;&middot;&nbsp;&nbsp;{SITE.edition}&nbsp;&nbsp;&middot;&nbsp;&nbsp;December 6th &ndash; 8th, 2026&nbsp;&nbsp;&middot;&nbsp;&nbsp;4:30 PM Daily&nbsp;&nbsp;&middot;&nbsp;&nbsp;Free Entry&nbsp;&nbsp;&middot;&nbsp;&nbsp;DELSU Prays&nbsp;&nbsp;&middot;&nbsp;&nbsp;</span>
       </div>
 
-
-      <section id="journey" className="journey">
-        <div className="jsticky">
-          {SLIDES.map((s, i) => (
-            <div key={i} className={"jslide" + (i === 0 ? " on" : "")}>
-              <div className="bg" style={{ backgroundImage: `url(${s.bg})` }} />
-              <div className="veil" />
-              <div className="jgrid">
-                <div>
-                  <div className="jnum">{s.year}</div>
-                  <div className="jtheme">{s.theme}{s.now ? <span style={{ color: "var(--gold)" }}> &middot; you are here</span> : null}</div>
-                  <div className="jline">{s.line}</div>
-                </div>
-                {s.img ? <div className="jframe"><img src={s.img} alt={"DELSU Prays " + s.year + " flyer"} loading="lazy" decoding="async" /></div> : null}
-              </div>
-            </div>
-          ))}
-          <div id="jdots" className="jdots">{SLIDES.map((_, i) => <i key={i} className={i === 0 ? "on" : ""} />)}</div>
-          <div className="jhint">Nine editions &middot; keep scrolling</div>
-        </div>
-      </section>
 
       <div className="quote">
         <div className="bg" style={{ backgroundImage: "url(img/hero_night_a.jpg)" }} />
