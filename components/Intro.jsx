@@ -28,10 +28,16 @@ export default function Intro() {
     let seen = null;
     try { seen = localStorage.getItem(SEEN); } catch (e) {}
     const RM = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-    if (!seen && !RM) { track(() => setGone(false), 1500); // let the logo gate finish first
-      track(() => setStage(1), 4400); } // hold the question, then offer the button
+    if (!seen && !RM) track(() => setGone(false), 1500); // let the logo gate finish first
     else if (!seen && RM) { try { localStorage.setItem(SEEN, "1"); } catch (e) {} }
   }, []);
+
+  // hold the question for a beat, then offer the button
+  useEffect(() => {
+    if (gone || stage !== 0) return;
+    const t = setTimeout(() => setStage(1), 3000);
+    return () => clearTimeout(t);
+  }, [gone, stage]);
 
   // embers canvas
   useEffect(() => {
