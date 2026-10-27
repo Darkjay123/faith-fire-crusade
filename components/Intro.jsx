@@ -28,7 +28,8 @@ export default function Intro() {
     let seen = null;
     try { seen = localStorage.getItem(SEEN); } catch (e) {}
     const RM = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-    if (!seen && !RM) track(() => setGone(false), 1500); // let the logo gate finish first
+    if (!seen && !RM) { track(() => setGone(false), 1500); // let the logo gate finish first
+      track(() => setStage(1), 4400); } // hold the question, then offer the button
     else if (!seen && RM) { try { localStorage.setItem(SEEN, "1"); } catch (e) {} }
   }, []);
 
