@@ -48,7 +48,8 @@ export default function Intro() {
     let raf, parts = [];
     const size = () => { cv.width = innerWidth; cv.height = innerHeight; };
     size(); addEventListener("resize", size);
-    for (let i = 0; i < 55; i++) parts.push(spawn(true));
+    const N = Math.max(24, Math.min(55, Math.round((innerWidth * innerHeight) / 16000)));
+    for (let i = 0; i < N; i++) parts.push(spawn(true));
     function spawn(anyY) {
       return { x: Math.random() * innerWidth, y: anyY ? Math.random() * innerHeight : innerHeight + 10,
         r: 0.6 + Math.random() * 2.1, s: 0.25 + Math.random() * 0.85, d: Math.random() * 2 * Math.PI,
