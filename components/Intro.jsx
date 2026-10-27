@@ -143,8 +143,10 @@ export default function Intro() {
   useEffect(() => {
     const esc = (e) => { if (e.key === "Escape" && !gone && stage >= 2) finish(false); };
     addEventListener("keydown", esc);
-    return () => { removeEventListener("keydown", esc); clearTimers(); stopAudio(); };
+    return () => removeEventListener("keydown", esc); // timers are cleared on finish/unmount only
   }, [gone, stage]);
+
+  useEffect(() => () => { clearTimers(); stopAudio(); }, []);
 
   useEffect(() => {
     if (!gone && stage >= 2) document.body.classList.add("intro-lock");
