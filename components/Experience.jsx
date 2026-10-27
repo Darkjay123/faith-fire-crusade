@@ -194,7 +194,6 @@ export default function Experience() {
         </a>
         <nav className="nav" aria-label="Main">
           <a href="#nights">Three Nights</a>
-        <a href="#testimony">Testimony</a>
           <a href="#testimony">Testimony</a>
           <a href="#invite">Invite</a>
           <a href="#venue">Venue</a>
