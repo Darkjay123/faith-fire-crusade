@@ -76,12 +76,13 @@ export default function Experience() {
     };
     tick(); const iv = setInterval(tick, 1000);
 
+    let mx = 0.5; // shared by the ember drift and the hero parallax below
     const cv = document.getElementById("embers");
     let raf; let running = true; let rs = null;
     if (cv && !RM) {
       const cx = cv.getContext("2d");
       const N = Math.max(22, Math.min(70, Math.round(innerWidth / (innerWidth < 760 ? 26 : 14))));
-      let ps = [], mx = 0.5;
+      let ps = [];
       for (let i = 0; i < N; i++) ps.push({ x: Math.random(), y: Math.random(), r: Math.random() * 2 + 0.5, s: Math.random() * 0.3 + 0.1, w: Math.random() * 6.28, a: Math.random() * 0.5 + 0.2 });
       rs = () => { cv.width = innerWidth; cv.height = innerHeight; }; rs();
       addEventListener("resize", rs);
