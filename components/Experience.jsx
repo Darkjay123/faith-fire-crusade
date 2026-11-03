@@ -69,7 +69,7 @@ export default function Experience() {
         cell(pad(Math.floor((d % 6e4) / 1e3)), "Secs");
       if (cd) cd.innerHTML = html; if (cd2) cd2.innerHTML = html;
       if (est) {
-        if (state === "pre") est.textContent = "Counting down to Opening Night · 4:30 PM WAT";
+        if (state === "pre") est.textContent = "Counting down to Opening Night · 4:30 PM\u00a0WAT";
         else if (state === "day1") est.textContent = "Day One is underway · next service Monday 4:30 PM";
         else est.textContent = "Day Two is underway · final night Tuesday 4:30 PM";
       }
