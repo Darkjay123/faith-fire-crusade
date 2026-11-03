@@ -27,6 +27,7 @@ export default function Intro() {
     setMounted(true);
     let seen = null;
     try { seen = localStorage.getItem(SEEN); } catch (e) {}
+    try { if (new URLSearchParams(location.search).has("nointro")) seen = "1"; } catch (e) {}
     const RM = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
     if (!seen && !RM) track(() => setGone(false), 1500); // let the logo gate finish first
     else if (!seen && RM) { try { localStorage.setItem(SEEN, "1"); } catch (e) {} }
