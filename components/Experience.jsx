@@ -219,7 +219,7 @@ export default function Experience() {
         <div className="hveil" />
         <canvas id="embers" className="embers" aria-hidden="true" />
         <div className="hin">
-          <span className="eyebrow"><span className="dot" />&nbsp;The 9th Edition &middot; December 2026</span>
+          <span className="eyebrow"><span className="dot" />&nbsp;The 9th Edition &middot; December&nbsp;2026</span>
           <h1 className="h1a">Faith <span className="amp">&amp;</span> Fire</h1>
           <div className="h1b">Crusade &middot; DELSU Prays &middot; The 9th Edition</div>
           <div className="hwhen">
