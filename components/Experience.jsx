@@ -193,6 +193,7 @@ export default function Experience() {
           <span className="t"><b>Faith &amp; Fire &rsquo;26</b>The Watchmen Prayer Network</span>
         </a>
         <nav className="nav" aria-label="Main">
+          <a href="#ground">The Ground</a>
           <a href="#nights">Three Nights</a>
           <a href="#testimony">Testimony</a>
           <a href="#invite">Invite</a>
@@ -205,6 +206,7 @@ export default function Experience() {
 
       <div id="mnav" className="mnav" role="dialog" aria-label="Menu">
         <p className="msm">Faith &amp; Fire Crusade &rsquo;26</p>
+        <a href="#ground">Enter the Ground</a>
         <a href="#nights">Three Nights</a>
         <a href="#testimony">Testimony</a>
         <a href="#invite">Invite a Friend</a>

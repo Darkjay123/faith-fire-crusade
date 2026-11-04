@@ -125,10 +125,9 @@ export default function Intro() {
     try { localStorage.setItem(SEEN, "1"); } catch (e) {}
     setGone(true);
     document.body.classList.remove("intro-lock");
-    if (goRegister) {
-      const el = document.getElementById("register");
-      if (el) setTimeout(() => el.scrollIntoView({ behavior: "smooth" }), 350);
-    }
+    // Hand off to the Ground experience; the register pick lands at its gate.
+    history.replaceState(null, "", goRegister ? "#ggate" : "#ground");
+    try { dispatchEvent(new HashChangeEvent("hashchange")); } catch (e) {}
   };
 
   const begin = () => {
@@ -143,7 +142,7 @@ export default function Intro() {
   };
 
   useEffect(() => {
-    const esc = (e) => { if (e.key === "Escape" && !gone && stage >= 2) finish(false); };
+    const esc = (e) => { if (e.key === "Escape" && !gone && stage >= 2) finish(false); }; // finishes to the ground
     addEventListener("keydown", esc);
     return () => removeEventListener("keydown", esc); // timers are cleared on finish/unmount only
   }, [gone, stage]);
@@ -202,7 +201,7 @@ export default function Intro() {
           <div className="ihead"><span className="idote" />{SITE.edition} · Free entry</div>
           <h1 className="iq">December 6&ndash;8.<br /><em>4:30 PM</em> daily.</h1>
           <button className="ibtn gold" onClick={() => finish(true)}>I&rsquo;ll be there</button>
-          <button className="ilink" onClick={() => finish(false)}>Explore the crusade first</button>
+          <button className="ilink" onClick={() => finish(false)}>Walk the crusade ground</button>
         </div>
       )}
 
