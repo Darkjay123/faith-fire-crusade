@@ -393,8 +393,9 @@ body.in-ground .header, body.in-ground .mobbar, body.in-ground main{visibility:h
  background:radial-gradient(circle,rgba(255,244,214,.85),rgba(255,220,160,.25) 40%,transparent 72%);filter:blur(.5px)}
 .g-pole-l{left:26%}.g-pole-r{right:26%}
 /* tents */
-.g-tent{position:absolute;top:36%;width:9%;height:9%;background:linear-gradient(180deg,#d8cbb6,#8a7c66);opacity:.92;
- clip-path:polygon(50% 0,100% 78%,88% 100%,12% 100%,0 78%);box-shadow:0 0 30px rgba(255,230,190,.15)}
+.g-tent{position:absolute;top:37.5%;width:8%;height:7%;background:linear-gradient(180deg,#efe6d2,#9a8a72);opacity:.85;
+ clip-path:polygon(50% 0,100% 74%,92% 100%,8% 100%,0 74%);box-shadow:0 0 34px rgba(255,214,150,.22)}
+.g-tent::after{content:"";position:absolute;inset:0;background:radial-gradient(70% 60% at 50% 40%,rgba(255,200,120,.25),transparent 70%)}
 .g-tent-l{left:8%}.g-tent-r{right:8%}
 /* ground */
 .g-ground{position:absolute;left:-2%;right:-2%;top:44%;bottom:-6%;
@@ -433,7 +434,7 @@ body.in-ground .header, body.in-ground .mobbar, body.in-ground main{visibility:h
 .g-hnav{display:flex;gap:8px;align-items:center}
 .g-hbtn{font-size:10.5px;letter-spacing:.16em;text-transform:uppercase;color:rgba(255,242,216,.9);background:rgba(20,10,6,.55);border:1px solid rgba(255,178,46,.28);border-radius:99px;padding:9px 14px;cursor:pointer}
 .g-hbtn.gold{background:#FF6A16;border-color:#FF6A16;color:#140505;font-weight:700}
-.g-hint{position:fixed;left:50%;bottom:86px;transform:translateX(-50%);z-index:30;font-size:11px;letter-spacing:.2em;text-transform:uppercase;color:rgba(255,242,216,.62);text-align:center;animation:ghfade 1.2s ease-in-out infinite alternate;pointer-events:none}
+.g-hint{position:fixed;left:50%;bottom:86px;transform:translateX(-50%);z-index:30;font-size:11px;letter-spacing:.2em;text-transform:uppercase;color:rgba(255,242,216,.8);text-align:center;animation:ghfade 1.2s ease-in-out infinite alternate;pointer-events:none}
 @keyframes ghfade{from{opacity:.45}to{opacity:.95}}
 .g-chips{position:fixed;left:50%;bottom:calc(14px + env(safe-area-inset-bottom));transform:translateX(-50%);z-index:30;display:flex;gap:6px;padding:7px;background:rgba(10,4,3,.66);border:1px solid rgba(255,178,46,.22);border-radius:99px;backdrop-filter:blur(8px);max-width:calc(100vw - 20px);overflow-x:auto;scrollbar-width:none}
 .g-chips::-webkit-scrollbar{display:none}

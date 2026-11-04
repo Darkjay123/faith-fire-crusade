@@ -192,15 +192,15 @@ export default function Ground() {
           <div className="g-truss g-truss-l" /><div className="g-truss g-truss-r" /><div className="g-truss g-truss-top" />
           <div className="g-speaker g-spk-l" /><div className="g-speaker g-spk-r" />
           <div className="g-platform" />
-          <div className="g-beam g-beam-1" /><div className="g-beam g-beam-2" /><div className="g-beam g-beam-3" />
+          <div className="g-beam g-beam-1" style={{ "--r0": "-20deg", "--r1": "-10deg" }} /><div className="g-beam g-beam-2" style={{ "--r0": "-3deg", "--r1": "6deg" }} /><div className="g-beam g-beam-3" style={{ "--r0": "10deg", "--r1": "19deg" }} />
         </div>
         <div className="g-pole g-pole-l"><i /><b /></div>
         <div className="g-pole g-pole-r"><i /><b /></div>
         <div className="g-tent g-tent-l" /><div className="g-tent g-tent-r" />
         <div className="g-ground">
           <svg className="g-roads" viewBox="0 0 100 60" preserveAspectRatio="none" aria-hidden="true">
-            <path d="M4,60 C10,40 20,26 34,14" fill="none" stroke="url(#rg)" strokeWidth="0.55" strokeLinecap="round" opacity=".8" />
-            <path d="M96,60 C90,42 78,28 66,16" fill="none" stroke="url(#rg)" strokeWidth="0.55" strokeLinecap="round" opacity=".8" />
+            <path d="M2,60 C8,44 22,24 46,10" fill="none" stroke="url(#rg)" strokeWidth="0.55" strokeLinecap="round" opacity=".8" />
+            <path d="M98,60 C92,44 78,24 54,10" fill="none" stroke="url(#rg)" strokeWidth="0.55" strokeLinecap="round" opacity=".8" />
             <defs><linearGradient id="rg" x1="0" y1="1" x2="0" y2="0"><stop offset="0" stopColor="#FF6A16" stopOpacity=".05" /><stop offset=".6" stopColor="#FFB72E" stopOpacity=".5" /><stop offset="1" stopColor="#FFD98A" stopOpacity=".85" /></linearGradient></defs>
           </svg>
           <span className="g-road g-road-l">Olori 19 Road</span>
@@ -224,10 +224,10 @@ export default function Ground() {
           <div className="g-floorlight g-fl-1" /><div className="g-floorlight g-fl-2" />
         </div>
         {/* hotspots */}
-        <button className={`g-hot g-h-stage ${station === "stage" ? "on" : ""}`} style={{ left: "50%", top: "34%" }} onClick={() => go(station === "stage" ? null : "stage")} aria-label="The Stage">
+        <button className={`g-hot g-h-stage ${station === "stage" ? "on" : ""}`} style={{ left: "57%", top: "43%" }} onClick={() => go(station === "stage" ? null : "stage")} aria-label="The Stage">
           <i /><span>The Stage</span>
         </button>
-        <button className={`g-hot g-h-screen ${station === "screen" ? "on" : ""}`} style={{ left: "50%", top: "24%" }} onClick={() => go(station === "screen" ? null : "screen")} aria-label="Programme screen">
+        <button className={`g-hot g-h-screen ${station === "screen" ? "on" : ""}`} style={{ left: "33%", top: "24%" }} onClick={() => go(station === "screen" ? null : "screen")} aria-label="Programme screen">
           <i /><span>Programme</span>
         </button>
         <button className={`g-hot g-h-gate ${station === "gate" ? "on" : ""}`} style={{ left: "63%", top: "82%" }} onClick={() => go(station === "gate" ? null : "gate")} aria-label="The Gate">
