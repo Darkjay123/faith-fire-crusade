@@ -351,18 +351,22 @@ export default function Ground3D() {
     };
     /* people: bake each rig into a natural pose (arms down, raised in worship, half-raised) */
     const personMat = new THREE.MeshStandardMaterial({ vertexColors: true, roughness: 0.92, metalness: 0 });
-    const fillInst = (geo, take, yOff) => {
+    const peopleSway = [];
+    const fillInst = (geo, take, yOff, swaying) => {
       const inst = new THREE.InstancedMesh(geo, personMat, take.length);
+      const swayItems = [];
       take.forEach((sp, i) => {
         dummy.position.set(sp.x, sp.y || yOff, sp.z);
         dummy.rotation.set(0, (FLIP ? Math.PI : 0) + sp.yaw, 0);
         dummy.scale.setScalar(sp.s || 1); dummy.updateMatrix();
         inst.setMatrixAt(i, dummy.matrix);
+        if (swaying && i % 3 === 0 && swayItems.length < 46) swayItems.push({ i, x: sp.x, y: sp.y || yOff, z: sp.z, yaw: (FLIP ? Math.PI : 0) + sp.yaw, s: sp.s || 1, ph: Math.random() * 6.28, amp: 0.025 + Math.random() * 0.03 });
         const v = 0.72 + Math.random() * 0.4;
         inst.setColorAt(i, col.setRGB(v, v * 0.95, v * 0.9));
       });
       inst.instanceMatrix.needsUpdate = true; if (inst.instanceColor) inst.instanceColor.needsUpdate = true;
       scene.add(inst);
+      if (swayItems.length) peopleSway.push({ inst, items: swayItems });
     };
     const bakeSkinned = (mesh) => {
       const g = mesh.geometry, sk = mesh.skeleton;
@@ -409,7 +413,7 @@ export default function Ground3D() {
       geo.translate(-c.x, -b.min.y, -c.z);
       return geo;
     };
-    const placePeople = (file, list) => {
+    const placePeople = (file, list, swaying) => {
       new GLTFLoader().load("models/" + file + ".glb", (gltf) => {
         if (disposed) return;
         try {
@@ -417,14 +421,14 @@ export default function Ground3D() {
             const take = list.filter((_, j) => pick(j));
             if (!take.length) return;
             const geo = bakePose(gltf, mode);
-            if (geo) fillInst(geo, take, 0);
+            if (geo) fillInst(geo, take, 0, swaying);
           });
         } catch (e) { /* one bad model never kills the world */ }
       });
     };
     const standFiles = MOBILE ? ["spectator-d086fe", "villager-40255c"] : ["spectator-d086fe", "villager-40255c", "cafe-customer-ca7e8e", "townswoman-5aa87f"];
-    standFiles.forEach((f) => placePeople(f, slots.standing));
-    placePeople("seated-office-worker-854671", slots.seated.map((sp) => ({ ...sp, y: 0.18 })));
+    standFiles.forEach((f) => placePeople(f, slots.standing, true));
+    placePeople("seated-office-worker-854671", slots.seated.map((sp) => ({ ...sp, y: 0.18 })), false);
 
     /* ===== ENVIRONMENT ===== */
     const tent = (x, z, s) => { const g = new THREE.Group(); const c = add(g, new THREE.ConeGeometry(3.1, 2.6, 8), new THREE.MeshStandardMaterial({ color: 0xe9e2d4, roughness: 0.9, emissive: 0x35302a, emissiveIntensity: 0.35 }), 0, 1.7, 0); c.rotation.y = Math.PI / 8; add(g, new THREE.CylinderGeometry(0.03, 0.03, 1.2, 5), M.truss, 0, 3.4, 0); add(g, new THREE.BoxGeometry(0.25, 0.35, 0.02), new THREE.MeshStandardMaterial({ color: 0xff6a16, emissive: 0xff6a16, emissiveIntensity: 0.7 }), 0, 3.9, 0); g.position.set(x, 0, z); g.scale.setScalar(s); scene.add(g); };
@@ -448,6 +452,15 @@ export default function Ground3D() {
       scene.add(g);
     };
     mast(-13, 7, 2, -8); mast(13, 7, -2, -8); mast(-17, -6, 0, 2);
+    /* haze in the beams + warm glow over the crowd */
+    const haze = [];
+    const hazeTex = (() => { const c = cnv(256, 256), x = c.getContext("2d"); const g = x.createRadialGradient(128, 128, 8, 128, 128, 126); g.addColorStop(0, "rgba(255,235,205,0.85)"); g.addColorStop(0.5, "rgba(255,225,190,0.28)"); g.addColorStop(1, "rgba(255,225,190,0)"); x.fillStyle = g; x.fillRect(0, 0, 256, 256); return tex(c); })();
+    const hazeMk = (hx, hy, hz, hs, ho, hd) => { const sp = new THREE.Sprite(new THREE.SpriteMaterial({ map: hazeTex, transparent: true, opacity: ho, blending: THREE.AdditiveBlending, depthWrite: false })); sp.position.set(hx, hy, hz); sp.scale.setScalar(hs); sp.userData.bx = hx; sp.userData.d = hd; scene.add(sp); haze.push(sp); };
+    hazeMk(0, 4.2, -13, 9, 0.10, 0.9); hazeMk(-4, 3.4, -9, 7, 0.07, 2.1); hazeMk(5, 3.2, -9, 6.5, 0.07, 4.0); hazeMk(0, 2.6, 2, 12, 0.05, 5.2); hazeMk(0, 6.5, -16, 6, 0.12, 3.1);
+    /* light sweep across the backdrop screen */
+    const sweepTex = (() => { const c = cnv(128, 64), x = c.getContext("2d"); const g = x.createLinearGradient(0, 0, 128, 0); g.addColorStop(0, "rgba(255,200,120,0)"); g.addColorStop(0.5, "rgba(255,215,140,0.9)"); g.addColorStop(1, "rgba(255,200,120,0)"); x.fillStyle = g; x.fillRect(0, 0, 128, 64); return tex(c); })();
+    const sweep = new THREE.Mesh(new THREE.PlaneGeometry(3.4, 4.7), new THREE.MeshBasicMaterial({ map: sweepTex, transparent: true, opacity: 0.13, blending: THREE.AdditiveBlending, depthWrite: false }));
+    sweep.position.set(0, 3.3, -17.7); scene.add(sweep);
 
     /* buildings behind the fence */
     const bldg = (x, z, w, d, h, ry) => {
@@ -554,7 +567,7 @@ export default function Ground3D() {
       if (!MOBILE ? false : (ftN++, ftAcc += dt, ftN >= 50)) {
         const avg = ftAcc / ftN; ftAcc = 0; ftN = 0;
         if (avg > 0.038 && qLevel === 0) { qLevel = 1; renderer.setPixelRatio(1); fixSize(); }
-        else if (avg > 0.038 && qLevel === 1) { qLevel = 2; sway.forEach((s2) => { s2.holder.visible = false; }); embers.visible = false; }
+        else if (avg > 0.038 && qLevel === 1) { qLevel = 2; sway.forEach((s2) => { s2.holder.visible = false; }); embers.visible = false; peopleSway.forEach((ps2) => { ps2.inst.visible = false; }); haze.forEach((hz2) => { hz2.visible = false; }); sweep.visible = false; }
       }
       /* flight */
       if (flight) {
@@ -574,6 +587,17 @@ export default function Ground3D() {
       /* sway + fire + embers */
       const t = now / 1000;
       sway.forEach((s) => { s.holder.quaternion.copy(s.base); s.holder.rotateZ(Math.sin(t * 0.5 + s.phase) * s.amp); });
+      peopleSway.forEach((ps) => {
+        ps.items.forEach((it) => {
+          dummy.position.set(it.x, it.y + Math.sin(t * 1.5 + it.ph) * it.amp, it.z);
+          dummy.rotation.set(Math.sin(t * 0.8 + it.ph) * 0.035, it.yaw, 0);
+          dummy.scale.setScalar(it.s); dummy.updateMatrix();
+          ps.inst.setMatrixAt(it.i, dummy.matrix);
+        });
+        ps.inst.instanceMatrix.needsUpdate = true;
+      });
+      haze.forEach((h) => { h.position.x = h.userData.bx + Math.sin(t * 0.1 + h.userData.d) * 1.4; });
+      sweep.position.x = Math.sin(t * 0.12) * 5.5;
       flames.forEach((f, i) => { const k = 1 + Math.sin(t * 9 + i * 2.4) * 0.16 + Math.sin(t * 23 + i) * 0.07; f.scale.set(k, 1 + (k - 1) * 1.6, k); });
       fireLights.forEach((l, i) => { l.intensity = 34 + Math.sin(t * 11 + i * 3) * 8; });
       const pos = emGeo.attributes.position.array;
