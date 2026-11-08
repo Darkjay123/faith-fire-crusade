@@ -361,11 +361,11 @@ export default function Ground3D() {
         dummy.scale.setScalar(sp.s || 1); dummy.updateMatrix();
         inst.setMatrixAt(i, dummy.matrix);
         if (swaying && i % 3 === 0 && swayItems.length < 46) swayItems.push({ i, x: sp.x, y: sp.y || yOff, z: sp.z, yaw: (FLIP ? Math.PI : 0) + sp.yaw, s: sp.s || 1, ph: Math.random() * 6.28, amp: 0.025 + Math.random() * 0.03 });
-        const v = 0.72 + Math.random() * 0.4, pick = Math.random();
-        if (pick < 0.5) inst.setColorAt(i, col.setRGB(v, v * 0.96, v * 0.92));
-        else if (pick < 0.72) inst.setColorAt(i, col.setRGB(v * 0.5, v * 0.58, v * 0.95));
-        else if (pick < 0.87) inst.setColorAt(i, col.setRGB(v * 0.92, v * 0.52, v * 0.32));
-        else inst.setColorAt(i, col.setRGB(v * 0.95, v * 0.88, v * 0.55));
+        const v = 0.8 + Math.random() * 0.35, pick = Math.random();
+        if (pick < 0.62) inst.setColorAt(i, col.setRGB(v, v * 0.97, v * 0.94));
+        else if (pick < 0.78) inst.setColorAt(i, col.setRGB(v * 0.95, v * 0.93, v));
+        else if (pick < 0.9) inst.setColorAt(i, col.setRGB(v, v * 0.93, v * 0.87));
+        else inst.setColorAt(i, col.setRGB(v * 0.94, v * 0.98, v));
       });
       inst.instanceMatrix.needsUpdate = true; if (inst.instanceColor) inst.instanceColor.needsUpdate = true;
       scene.add(inst);
