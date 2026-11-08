@@ -171,11 +171,7 @@ export default function Ground3D() {
     try {
     const handle = { flyTo: null, drawLED: null };
     sceneRef.current = handle;
-    let frames = 0, dbgMsg = "starting";
-    const dbg = () => { const d = document.getElementById("g3dbg"); if (d) d.textContent = dbgMsg; };
-    const onErr = (e) => { dbgMsg = "WINERR " + (e.message || e.type); dbg(); };
-    addEventListener("error", onErr);
-    dbg();
+
       renderer = new THREE.WebGLRenderer({ antialias: true, powerPreference: "high-performance" });
     renderer.setPixelRatio(Math.min(devicePixelRatio || 1, 1.6));
     renderer.setSize(box.clientWidth, box.clientHeight);
@@ -185,7 +181,6 @@ export default function Ground3D() {
     box.appendChild(renderer.domElement);
     renderer.setClearColor(0x0a0608);
     renderer.domElement.className = "g3-canvas";
-    dbgMsg = "ctx " + box.clientWidth + "x" + box.clientHeight; dbg();
 
     const scene = new THREE.Scene();
     scene.background = new THREE.Color(0x050308);
@@ -380,7 +375,7 @@ export default function Ground3D() {
     const gate = new THREE.Group();
     add(gate, new THREE.CylinderGeometry(0.12, 0.14, 3.4, 6), M.truss, -2.6, 1.7, 0);
     add(gate, new THREE.CylinderGeometry(0.12, 0.14, 3.4, 6), M.truss, 2.6, 1.7, 0);
-    const gban = add(gate, new THREE.PlaneGeometry(5.4, 0.85), new THREE.MeshStandardMaterial({ map: bannerTex("WELCOME \u00b7 FAITH & FIRE '26", "#2a0f0f", "#ffdf9e"), emissive: 0x3a1608, emissiveIntensity: 0.6 }), 0, 3, 0);
+    const gban = add(gate, new THREE.PlaneGeometry(5.0, 0.8), new THREE.MeshStandardMaterial({ map: bannerTex("WELCOME \u00b7 FAITH & FIRE '26", "#2a0f0f", "#ffdf9e"), emissive: 0x3a1608, emissiveIntensity: 0.6 }), 0, 3.35, 0);
     gate.position.set(0, 0, 21); scene.add(gate);
     /* parked cars */
     const car = (x, z, c, ry) => { const g = new THREE.Group(); add(g, new THREE.BoxGeometry(2.5, 0.75, 1.25), new THREE.MeshStandardMaterial({ color: c, roughness: 0.4, metalness: 0.3 }), 0, 0.55, 0); add(g, new THREE.BoxGeometry(1.4, 0.55, 1.1), new THREE.MeshStandardMaterial({ color: c, roughness: 0.4, metalness: 0.3 }), -0.15, 1.2, 0); g.position.set(x, 0, z); g.rotation.y = ry; scene.add(g); };
@@ -439,8 +434,6 @@ export default function Ground3D() {
       if (disposed) return;
       raf = requestAnimationFrame(loop);
       try {
-      frames++;
-      if (frames % 5 === 1) { dbgMsg = "f=" + frames + " cam=" + camera.position.x.toFixed(2) + "," + camera.position.y.toFixed(2) + "," + camera.position.z.toFixed(2) + " look=" + look.x.toFixed(1) + "," + look.y.toFixed(1) + "," + look.z.toFixed(1) + " vp=" + box.clientWidth + "x" + box.clientHeight + " buf=" + renderer.domElement.width + "x" + renderer.domElement.height + " asp=" + camera.aspect.toFixed(3) + " dc=" + renderer.info.render.calls; dbg(); }
       const dt = Math.min(0.05, (now - t0) / 1000); t0 = now;
       /* flight */
       if (flight) {
@@ -480,7 +473,7 @@ export default function Ground3D() {
       renderer.render(scene, camera);
       } catch (err) {
         disposed = true; cancelAnimationFrame(raf);
-        dbgMsg = "FRAMEERR " + (err && err.message ? err.message : String(err)); dbg(); setFailed(dbgMsg);
+        setFailed("3D frame error: " + (err && err.message ? err.message : String(err)));
       }
     };
     raf = requestAnimationFrame(loop);
@@ -502,14 +495,14 @@ export default function Ground3D() {
 
     return () => {
       disposed = true; cancelAnimationFrame(raf);
-      removeEventListener("resize", onResize); removeEventListener("pointermove", onMove); removeEventListener("pointerup", onUp); removeEventListener("error", onErr); if (ro) ro.disconnect();
+      removeEventListener("resize", onResize); removeEventListener("pointermove", onMove); removeEventListener("pointerup", onUp); if (ro) ro.disconnect();
       el.removeEventListener("pointerdown", onDown); el.removeEventListener("wheel", onWheel); el.removeEventListener("touchmove", touchMove);
       renderer.dispose();
       if (el.parentNode) el.parentNode.removeChild(el);
       scene.traverse((o) => { if (o.geometry) o.geometry.dispose(); if (o.material) { (Array.isArray(o.material) ? o.material : [o.material]).forEach((mm) => { if (mm.map) mm.map.dispose(); mm.dispose(); }); } });
     };
     } catch (err) {
-      dbgMsg = "BUILDERR " + (err && err.message ? err.message : String(err)); dbg(); setFailed(dbgMsg);
+      setFailed("3D build error: " + (err && err.message ? err.message : String(err)));
       return () => {};
     }
     /* eslint-disable-next-line */
@@ -538,7 +531,6 @@ export default function Ground3D() {
   return (
     <div className={`ground ${station ? "focused" : ""}`} role="region" aria-label="Interactive crusade ground in 3D">
       <div ref={boxRef} className="g3-stagebox" />
-      <div id="g3dbg" className="g3-dbg" />
       {failed ? (
         <div className="g3-fail"><span>{failed}</span>Your browser could not open the 3D ground. <button className="g-hbtn gold" onClick={() => toSite("site")}>Open the simple view</button></div>
       ) : null}

@@ -499,4 +499,3 @@ address{font-style:normal;color:rgba(255,242,216,.85);font-size:14.5px;line-heig
 @keyframes g3pulse { 0%, 100% { transform: scale(1); opacity: .9; } 50% { transform: scale(1.35); opacity: 1; } }
 .g3-fail { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 14px; color: #fff2d8; z-index: 5; text-align: center; padding: 24px; }
 @media (max-width: 640px) { .g3-hot { font-size: 10px; padding: 6px 10px 6px 7px; } .g3-hot span { max-width: 64px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; } }
-.g3-dbg { position: absolute; top: 8px; left: 8px; z-index: 50; color: #0f0; font: 11px monospace; background: rgba(0,0,0,.6); padding: 3px 6px; pointer-events: none; }
