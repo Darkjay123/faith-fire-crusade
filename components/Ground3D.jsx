@@ -406,7 +406,7 @@ export default function Ground3D() {
     /* camera + controls */
     camera.position.set(...WIDE.pos);
     const look = new THREE.Vector3(...WIDE.tgt);
-    const sph = { r: Math.hypot(camera.position.x - look.x, camera.position.y - look.y, camera.position.z - look.z), th: Math.atan2(camera.position.x - look.x, camera.position.z - look.z), ph: Math.acos((camera.position.y - look.y) / camera.position.distanceTo(look)) };
+    const sph = { radius: Math.hypot(camera.position.x - look.x, camera.position.y - look.y, camera.position.z - look.z), theta: Math.atan2(camera.position.x - look.x, camera.position.z - look.z), phi: Math.acos((camera.position.y - look.y) / camera.position.distanceTo(look)) };
     let flight = null;
     const flyTo = (p, t) => { flight = { p: p.slice(), t: t.slice(), k: 0 }; };
     handle.flyTo = (k) => { const s = k ? STATIONS[k] : WIDE; flyTo(s.pos, s.tgt); };
@@ -418,14 +418,14 @@ export default function Ground3D() {
       const dx = e.clientX - px, dy = e.clientY - py;
       if (Math.abs(dx) + Math.abs(dy) > 4) moved = true;
       px = e.clientX; py = e.clientY;
-      sph.th -= dx * 0.0042; sph.ph = Math.min(1.32, Math.max(0.18, sph.ph - dy * 0.0034));
+      sph.theta -= dx * 0.0042; sph.phi = Math.min(1.32, Math.max(0.18, sph.phi - dy * 0.0034));
     };
     const onUp = () => { dragging = false; };
-    const onWheel = (e) => { e.preventDefault(); sph.r = Math.min(58, Math.max(6, sph.r + e.deltaY * 0.02)); };
+    const onWheel = (e) => { e.preventDefault(); sph.radius = Math.min(58, Math.max(6, sph.radius + e.deltaY * 0.02)); };
     const touchMove = (e) => {
       if (e.touches.length === 2) {
         const d = Math.hypot(e.touches[0].clientX - e.touches[1].clientX, e.touches[0].clientY - e.touches[1].clientY);
-        if (pinch) sph.r = Math.min(58, Math.max(6, sph.r - (d - pinch) * 0.06));
+        if (pinch) sph.radius = Math.min(58, Math.max(6, sph.radius - (d - pinch) * 0.06));
         pinch = d;
       } else pinch = 0;
     };
@@ -451,7 +451,7 @@ export default function Ground3D() {
         const fromL = new THREE.Vector3().lerpVectors(look, tg, e);
         camera.position.lerpVectors(from, p, e); look.lerpVectors(look.clone(), tg, e);
         const cur = camera.position.clone().sub(fromL);
-        if (flight.k >= 1) { sph.r = cur.length(); sph.th = Math.atan2(cur.x, cur.z); sph.ph = Math.acos(Math.max(-1, Math.min(1, cur.y / cur.length()))); look.copy(tg); flight = null; }
+        if (flight.k >= 1) { sph.radius = cur.length(); sph.theta = Math.atan2(cur.x, cur.z); sph.phi = Math.acos(Math.max(-1, Math.min(1, cur.y / cur.length()))); look.copy(tg); flight = null; }
         camera.lookAt(fromL);
       } else {
         camera.position.setFromSpherical(sph).add(look);
