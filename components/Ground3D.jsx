@@ -69,19 +69,19 @@ function dirtTex() {
 }
 
 function backdropTex() {
-  const c = cnv(512, 256), x = c.getContext("2d");
-  const g = x.createLinearGradient(0, 0, 0, 256);
+  const c = cnv(1024, 512), x = c.getContext("2d");
+  const g = x.createLinearGradient(0, 0, 0, 512);
   g.addColorStop(0, "#3a0f3e"); g.addColorStop(0.5, "#57104a"); g.addColorStop(1, "#1c0716");
-  x.fillStyle = g; x.fillRect(0, 0, 512, 256);
-  const rg = x.createRadialGradient(256, 90, 10, 256, 90, 210);
+  x.fillStyle = g; x.fillRect(0, 0, 1024, 512);
+  const rg = x.createRadialGradient(512, 180, 20, 512, 180, 420);
   rg.addColorStop(0, "rgba(255,120,220,0.55)"); rg.addColorStop(1, "rgba(255,120,220,0)");
-  x.fillStyle = rg; x.fillRect(0, 0, 512, 256);
-  x.strokeStyle = "rgba(255,180,240,0.22)"; x.lineWidth = 2;
-  for (let i = 0; i < 14; i++) { const a = (i / 13) * Math.PI - Math.PI / 2; x.beginPath(); x.moveTo(256, 120); x.lineTo(256 + Math.cos(a) * 340, 120 + Math.sin(a) * 240); x.stroke(); }
-  x.font = "bold 44px Georgia, serif"; x.fillStyle = "rgba(255,225,170,0.9)"; x.textAlign = "center";
-  x.fillText("FAITH \u0026 FIRE", 256, 150);
-  x.font = "18px Georgia, serif"; x.fillStyle = "rgba(255,210,160,0.75)";
-  x.fillText("DELSU PRAYS \u00b7 THE 9TH EDITION", 256, 184);
+  x.fillStyle = rg; x.fillRect(0, 0, 1024, 512);
+  x.strokeStyle = "rgba(255,180,240,0.22)"; x.lineWidth = 4;
+  for (let i = 0; i < 14; i++) { const a = (i / 13) * Math.PI - Math.PI / 2; x.beginPath(); x.moveTo(512, 240); x.lineTo(512 + Math.cos(a) * 680, 240 + Math.sin(a) * 480); x.stroke(); }
+  x.font = "bold 88px Georgia, serif"; x.fillStyle = "rgba(255,225,170,0.92)"; x.textAlign = "center";
+  x.fillText("FAITH \u0026 FIRE", 512, 300);
+  x.font = "36px Georgia, serif"; x.fillStyle = "rgba(255,210,160,0.78)";
+  x.fillText("DELSU PRAYS \u00b7 THE 9TH EDITION", 512, 368);
   return tex(c);
 }
 
@@ -267,7 +267,7 @@ export default function Ground3D() {
     /* backdrop + LED */
     add(stage, new THREE.PlaneGeometry(11.6, 4.6), new THREE.MeshStandardMaterial({ map: backdropTex(), roughness: 0.9, emissive: 0x30102a, emissiveIntensity: 0.5, emissiveMap: backdropTex() }), 0, 3.3, -17.8);
     const led = ledTex(); drawLED(led.c, "--");
-    const ledMesh = add(stage, new THREE.PlaneGeometry(4.6, 2.3), new THREE.MeshBasicMaterial({ map: led.t }), 5.2, 3.9, -14.2); ledMesh.rotation.y = -0.12;
+    const ledMesh = add(stage, new THREE.PlaneGeometry(4.2, 2.1), new THREE.MeshBasicMaterial({ map: led.t }), 6.4, 3.9, -14.2); ledMesh.rotation.y = -0.12;
     /* speakers */
     const spk = (x) => { const s = new THREE.Group(); add(s, new THREE.BoxGeometry(1.15, 0.95, 0.95), M.black, 0, 1.35, 0); add(s, new THREE.BoxGeometry(1.15, 0.95, 0.95), M.black, 0, 2.35, 0); add(s, new THREE.BoxGeometry(1.3, 1.0, 1.0), M.black, 0, 0.5, 0); s.position.set(x, 0, -12.6); stage.add(s); };
     spk(-5.6); spk(5.6);
@@ -361,8 +361,11 @@ export default function Ground3D() {
         dummy.scale.setScalar(sp.s || 1); dummy.updateMatrix();
         inst.setMatrixAt(i, dummy.matrix);
         if (swaying && i % 3 === 0 && swayItems.length < 46) swayItems.push({ i, x: sp.x, y: sp.y || yOff, z: sp.z, yaw: (FLIP ? Math.PI : 0) + sp.yaw, s: sp.s || 1, ph: Math.random() * 6.28, amp: 0.025 + Math.random() * 0.03 });
-        const v = 0.72 + Math.random() * 0.4;
-        inst.setColorAt(i, col.setRGB(v, v * 0.95, v * 0.9));
+        const v = 0.72 + Math.random() * 0.4, pick = Math.random();
+        if (pick < 0.5) inst.setColorAt(i, col.setRGB(v, v * 0.96, v * 0.92));
+        else if (pick < 0.72) inst.setColorAt(i, col.setRGB(v * 0.5, v * 0.58, v * 0.95));
+        else if (pick < 0.87) inst.setColorAt(i, col.setRGB(v * 0.92, v * 0.52, v * 0.32));
+        else inst.setColorAt(i, col.setRGB(v * 0.95, v * 0.88, v * 0.55));
       });
       inst.instanceMatrix.needsUpdate = true; if (inst.instanceColor) inst.instanceColor.needsUpdate = true;
       scene.add(inst);
@@ -435,6 +438,7 @@ export default function Ground3D() {
     tent(-11.5, -13.5, 1.1); tent(14.5, -10.5, 0.9); tent(-16, 6, 0.8);
     /* light masts with beams */
     const sway = [];
+    const beamGrad = (() => { const c = cnv(8, 128), x = c.getContext("2d"); const g = x.createLinearGradient(0, 0, 0, 128); g.addColorStop(0, "#000"); g.addColorStop(0.75, "#b0b0b0"); g.addColorStop(1, "#fff"); x.fillStyle = g; x.fillRect(0, 0, 8, 128); return tex(c); })();
     const mast = (x, z, tx, tz) => {
       const g = new THREE.Group();
       add(g, new THREE.CylinderGeometry(0.14, 0.18, 9, 8), M.truss, 0, 4.5, 0);
@@ -442,7 +446,7 @@ export default function Ground3D() {
       const heads = [-0.6, 0.6].map((o) => add(g, new THREE.BoxGeometry(0.5, 0.3, 0.4), M.black, o, 8.95, 0.1));
       g.position.set(x, 0, z); g.lookAt(tx, 0, tz); g.rotation.x = 0; g.rotation.z = 0;
       const spot = new THREE.SpotLight(0xfff2d8, 1700, 110, 0.42, 0.55); spot.position.set(x, 9, z); spot.target.position.set(tx, 0, tz); scene.add(spot, spot.target);
-      const beam = new THREE.Mesh(new THREE.ConeGeometry(5.5, 15, 20, 1, true), new THREE.MeshBasicMaterial({ color: 0xffe9c0, transparent: true, opacity: 0.032, side: THREE.DoubleSide, blending: THREE.AdditiveBlending, depthWrite: false }));
+      const beam = new THREE.Mesh(new THREE.ConeGeometry(5.5, 15, 20, 1, true), new THREE.MeshBasicMaterial({ color: 0xffe9c0, transparent: true, opacity: 0.055, alphaMap: beamGrad, side: THREE.DoubleSide, blending: THREE.AdditiveBlending, depthWrite: false }));
       beam.position.set(x, 9, z);
       const dir = new THREE.Vector3(tx - x, -9, tz - z).normalize();
       beam.quaternion.setFromUnitVectors(new THREE.Vector3(0, -1, 0), dir.clone().normalize());
@@ -457,6 +461,9 @@ export default function Ground3D() {
     const hazeTex = (() => { const c = cnv(256, 256), x = c.getContext("2d"); const g = x.createRadialGradient(128, 128, 8, 128, 128, 126); g.addColorStop(0, "rgba(255,235,205,0.85)"); g.addColorStop(0.5, "rgba(255,225,190,0.28)"); g.addColorStop(1, "rgba(255,225,190,0)"); x.fillStyle = g; x.fillRect(0, 0, 256, 256); return tex(c); })();
     const hazeMk = (hx, hy, hz, hs, ho, hd) => { const sp = new THREE.Sprite(new THREE.SpriteMaterial({ map: hazeTex, transparent: true, opacity: ho, blending: THREE.AdditiveBlending, depthWrite: false })); sp.position.set(hx, hy, hz); sp.scale.setScalar(hs); sp.userData.bx = hx; sp.userData.d = hd; scene.add(sp); haze.push(sp); };
     hazeMk(0, 4.2, -13, 9, 0.10, 0.9); hazeMk(-4, 3.4, -9, 7, 0.07, 2.1); hazeMk(5, 3.2, -9, 6.5, 0.07, 4.0); hazeMk(0, 2.6, 2, 12, 0.05, 5.2); hazeMk(0, 6.5, -16, 6, 0.12, 3.1);
+    const haloMk = (hx, hy, hz, hs, ho, fogless) => { const sp = new THREE.Sprite(new THREE.SpriteMaterial({ map: hazeTex, transparent: true, opacity: ho, blending: THREE.AdditiveBlending, depthWrite: false, fog: !fogless })); sp.position.set(hx, hy, hz); sp.scale.setScalar(hs); scene.add(sp); return sp; };
+    haloMk(-13, 9.15, 7, 2.2, 0.4, true); haloMk(13, 9.15, 7, 2.2, 0.4, true);
+    haloMk(-30, 38, -60, 7, 0.5, true); haloMk(-30, 38, -60, 2.4, 0.85, true);
     /* light sweep across the backdrop screen */
     const sweepTex = (() => { const c = cnv(128, 64), x = c.getContext("2d"); const g = x.createLinearGradient(0, 0, 128, 0); g.addColorStop(0, "rgba(255,200,120,0)"); g.addColorStop(0.5, "rgba(255,215,140,0.9)"); g.addColorStop(1, "rgba(255,200,120,0)"); x.fillStyle = g; x.fillRect(0, 0, 128, 64); return tex(c); })();
     const sweep = new THREE.Mesh(new THREE.PlaneGeometry(3.4, 4.7), new THREE.MeshBasicMaterial({ map: sweepTex, transparent: true, opacity: 0.13, blending: THREE.AdditiveBlending, depthWrite: false }));
@@ -483,7 +490,7 @@ export default function Ground3D() {
     cont.position.set(18.5, 1.2, -2); cont.rotation.y = 0.1; scene.add(cont);
     const fence = new THREE.Mesh(new THREE.BoxGeometry(0.35, 1.7, 34), new THREE.MeshStandardMaterial({ color: 0x4a443c, roughness: 0.95 }));
     fence.position.set(21.5, 0.85, 2); scene.add(fence);
-    const bannerMat = new THREE.MeshStandardMaterial({ map: bannerTex("FAITH \u0026 FIRE \u00b7 DELSU PRAYS", "#4a1010", "#ffb72e", 30), roughness: 0.9, emissive: 0x2a0c08, emissiveIntensity: 0.5 });
+    const bannerMat = new THREE.MeshStandardMaterial({ map: bannerTex("FAITH \u0026 FIRE \u00b7 DELSU PRAYS", "#4a1010", "#ffb72e", 28), roughness: 0.9, emissive: 0x2a0c08, emissiveIntensity: 0.5 });
     [-8, 4, 14].forEach((z) => { const b = new THREE.Mesh(new THREE.PlaneGeometry(5.5, 1.05), bannerMat); b.position.set(21.3, 1.6, z); b.rotation.y = -Math.PI / 2; scene.add(b); });
     /* gate at the front */
     const gate = new THREE.Group();
