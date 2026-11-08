@@ -281,7 +281,12 @@ export default function Ground3D() {
     add(stage, new THREE.BoxGeometry(1.6, 0.3, 0.5), M.wood, 0, 0.15, -11.4); add(stage, new THREE.BoxGeometry(1.6, 0.6, 0.5), M.wood, 0, 0.3, -11.95);
 
     /* ===== CROWD: real low-poly people (Polyfork free GLBs, vertex-coloured) ===== */
-    const chairMesh = new THREE.InstancedMesh(new THREE.BoxGeometry(0.46, 0.5, 0.44), new THREE.MeshStandardMaterial({ roughness: 0.8 }), CAP);
+    const chairParts = [];
+    const seat0 = new THREE.BoxGeometry(0.44, 0.06, 0.42); seat0.translate(0, 0.42, 0); chairParts.push(seat0);
+    const back0 = new THREE.BoxGeometry(0.42, 0.5, 0.05); back0.translate(0, 0.66, -0.185); chairParts.push(back0);
+    [[-0.18, 0.16], [0.18, 0.16], [-0.18, -0.16], [0.18, -0.16]].forEach(([lx, lz]) => { const leg0 = new THREE.BoxGeometry(0.045, 0.4, 0.045); leg0.translate(lx, 0.2, lz); chairParts.push(leg0); });
+    const chairGeo = mergeGeometries(chairParts, false);
+    const chairMesh = new THREE.InstancedMesh(chairGeo, new THREE.MeshStandardMaterial({ roughness: 0.8 }), CAP);
     const dummy = new THREE.Object3D(); const col = new THREE.Color();
     const slots = { seated: [], standing: [] };
     let ci = 0;
@@ -391,13 +396,13 @@ export default function Ground3D() {
     cont.position.set(18.5, 1.2, -2); cont.rotation.y = 0.1; scene.add(cont);
     const fence = new THREE.Mesh(new THREE.BoxGeometry(0.35, 1.7, 34), new THREE.MeshStandardMaterial({ color: 0x4a443c, roughness: 0.95 }));
     fence.position.set(21.5, 0.85, 2); scene.add(fence);
-    const bannerMat = new THREE.MeshStandardMaterial({ map: bannerTex("FAITH \u0026 FIRE \u00b7 DELSU PRAYS", "#4a1010", "#ffb72e"), roughness: 0.9, emissive: 0x2a0c08, emissiveIntensity: 0.5 });
+    const bannerMat = new THREE.MeshStandardMaterial({ map: bannerTex("FAITH \u0026 FIRE \u00b7 DELSU PRAYS", "#4a1010", "#ffb72e", 30), roughness: 0.9, emissive: 0x2a0c08, emissiveIntensity: 0.5 });
     [-8, 4, 14].forEach((z) => { const b = new THREE.Mesh(new THREE.PlaneGeometry(5.5, 1.05), bannerMat); b.position.set(21.3, 1.6, z); b.rotation.y = -Math.PI / 2; scene.add(b); });
     /* gate at the front */
     const gate = new THREE.Group();
     add(gate, new THREE.CylinderGeometry(0.12, 0.14, 3.4, 6), M.truss, -2.6, 1.7, 0);
     add(gate, new THREE.CylinderGeometry(0.12, 0.14, 3.4, 6), M.truss, 2.6, 1.7, 0);
-    const gban = add(gate, new THREE.PlaneGeometry(5.0, 0.8), new THREE.MeshStandardMaterial({ map: bannerTex("WELCOME \u00b7 FAITH & FIRE", "#2a0f0f", "#ffdf9e", 28), emissive: 0x3a1608, emissiveIntensity: 0.6 }), 0, 3.05, 0);
+    const gban = add(gate, new THREE.PlaneGeometry(5.0, 0.8), new THREE.MeshStandardMaterial({ map: bannerTex("WELCOME \u00b7 FAITH & FIRE", "#2a0f0f", "#ffdf9e", 28), emissive: 0x6a2a10, emissiveIntensity: 1.5 }), 0, 3.05, 0);
     gate.position.set(0, 0, 13.5); scene.add(gate);
     /* parked cars */
     const car = (x, z, c, ry) => { const g = new THREE.Group(); add(g, new THREE.BoxGeometry(2.5, 0.75, 1.25), new THREE.MeshStandardMaterial({ color: c, roughness: 0.4, metalness: 0.3 }), 0, 0.55, 0); add(g, new THREE.BoxGeometry(1.4, 0.55, 1.1), new THREE.MeshStandardMaterial({ color: c, roughness: 0.4, metalness: 0.3 }), -0.15, 1.2, 0); g.position.set(x, 0, z); g.rotation.y = ry; scene.add(g); };
@@ -408,8 +413,8 @@ export default function Ground3D() {
     const altar = (x, z) => {
       const g = new THREE.Group();
       for (let i = 0; i < 7; i++) { const a = (i / 7) * Math.PI * 2; add(g, new THREE.BoxGeometry(0.28, 0.2, 0.22), new THREE.MeshStandardMaterial({ color: 0x55504a, roughness: 1 }), Math.cos(a) * 0.5, 0.1, Math.sin(a) * 0.5); }
-      const f = add(g, new THREE.ConeGeometry(0.22, 0.7, 8), new THREE.MeshBasicMaterial({ color: 0xff8a1e, transparent: true, opacity: 0.9 }), 0, 0.5, 0);
-      const fl = new THREE.PointLight(0xff7a1e, 40, 14, 2); fl.position.set(0, 1, 0); g.add(fl);
+      const f = add(g, new THREE.ConeGeometry(0.3, 1.05, 8), new THREE.MeshBasicMaterial({ color: 0xff8a1e, transparent: true, opacity: 0.92 }), 0, 0.68, 0);
+      const fl = new THREE.PointLight(0xff7a1e, 60, 16, 2); fl.position.set(0, 1, 0); g.add(fl);
       g.position.set(x, 0, z); scene.add(g); flames.push(f); fireLights.push(fl);
     };
     altar(-11, 3); altar(11, 3);
