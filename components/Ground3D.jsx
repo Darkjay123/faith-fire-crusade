@@ -8,9 +8,9 @@ import { SITE } from "../lib/config";
    to fly to a place, panels carry the details. #site returns to the scroll site. */
 
 const STATIONS = {
-  stage: { fb: ["57%","43%"], label: "The Stage", pos: [0, 3.6, -2.5], tgt: [0, 3.0, -14.5], anchor: [0, 4.4, -13] },
-  screen: { fb: ["33%","24%"], label: "Programme", pos: [4.2, 4.0, -5.5], tgt: [5.4, 3.8, -14.5], anchor: [5.4, 5.2, -14.6] },
-  gate: { fb: ["55%","88%"], label: "The Gate", pos: [2.5, 4.5, 27.5], tgt: [0, 2.2, 21], anchor: [0, 4.9, 21] },
+  stage: { fb: ["57%","43%"], label: "The Stage", pos: [0, 3.6, -2.5], tgt: [0, 3.0, -14.5], anchor: [-4.8, 6.3, -13.4] },
+  screen: { fb: ["33%","24%"], label: "Programme", pos: [4.2, 4.0, -5.5], tgt: [5.4, 3.8, -14.5], anchor: [5.4, 5.75, -14.6] },
+  gate: { fb: ["55%","88%"], label: "The Gate", pos: [2.5, 4.2, 20], tgt: [0, 2.2, 13.5], anchor: [0, 4.3, 13.5] },
   fire: { fb: ["30%","78%"], label: "Fire Altars", pos: [-8.0, 3.4, 9.0], tgt: [-11, 1.2, 3], anchor: [-11, 2.4, 3] },
   gallery: { fb: ["82%","60%"], label: "Moments", pos: [10, 3.2, 11], tgt: [0, 1.6, 0], anchor: [10, 2.6, 9] },
   roads: { fb: ["12%","88%"], label: "Directions", pos: [0, 26, 10], tgt: [0, 0, -6], anchor: [-7, 0.8, 13] },
@@ -378,8 +378,8 @@ export default function Ground3D() {
     const gate = new THREE.Group();
     add(gate, new THREE.CylinderGeometry(0.12, 0.14, 3.4, 6), M.truss, -2.6, 1.7, 0);
     add(gate, new THREE.CylinderGeometry(0.12, 0.14, 3.4, 6), M.truss, 2.6, 1.7, 0);
-    const gban = add(gate, new THREE.PlaneGeometry(5.0, 0.8), new THREE.MeshStandardMaterial({ map: bannerTex("WELCOME \u00b7 FAITH & FIRE '26", "#2a0f0f", "#ffdf9e"), emissive: 0x3a1608, emissiveIntensity: 0.6 }), 0, 3.35, 0);
-    gate.position.set(0, 0, 21); scene.add(gate);
+    const gban = add(gate, new THREE.PlaneGeometry(5.0, 0.8), new THREE.MeshStandardMaterial({ map: bannerTex("WELCOME \u00b7 FAITH & FIRE '26", "#2a0f0f", "#ffdf9e"), emissive: 0x3a1608, emissiveIntensity: 0.6 }), 0, 3.05, 0);
+    gate.position.set(0, 0, 13.5); scene.add(gate);
     /* parked cars */
     const car = (x, z, c, ry) => { const g = new THREE.Group(); add(g, new THREE.BoxGeometry(2.5, 0.75, 1.25), new THREE.MeshStandardMaterial({ color: c, roughness: 0.4, metalness: 0.3 }), 0, 0.55, 0); add(g, new THREE.BoxGeometry(1.4, 0.55, 1.1), new THREE.MeshStandardMaterial({ color: c, roughness: 0.4, metalness: 0.3 }), -0.15, 1.2, 0); g.position.set(x, 0, z); g.rotation.y = ry; scene.add(g); };
     car(19.5, 15, 0x1a1d22, 0.25); car(23, 17, 0x352038, -0.1); car(19, 18.6, 0x3a1c1c, 0.3);
