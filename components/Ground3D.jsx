@@ -23,7 +23,7 @@ const STATIONS = {
   roads: { fb: ["12%","88%"], label: "Directions", pos: [0, 26, 10], tgt: [0, 0, -6], anchor: [-7, 0.8, 13] },
 };
 const WIDE = { pos: [0, 9.5, 31], tgt: [0, 2.5, -10] };
-const WIDE_M = { pos: [0, 5.4, 24], tgt: [0, 3.3, -7] };
+const WIDE_M = { pos: [0, 5.4, 24], tgt: [0, 4.4, -7] };
 const PHOTOS = [
   ["img/ground_crowd_2024.jpg", "The ground fills up — night one"],
   ["img/ground_crowd_2025.jpg", "Hands raised across the field"],
@@ -195,7 +195,7 @@ export default function Ground3D() {
     const scene = new THREE.Scene();
     scene.background = new THREE.Color(0x050308);
     scene.fog = new THREE.FogExp2(0x070409, 0.016);
-    const camera = new THREE.PerspectiveCamera(58, box.clientWidth / box.clientHeight, 0.1, 220);
+    const camera = new THREE.PerspectiveCamera(MOBILE ? 32 : 58, box.clientWidth / box.clientHeight, 0.1, 220);
 
     /* sky: stars + faint moon */
     {
