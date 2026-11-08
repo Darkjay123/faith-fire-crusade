@@ -91,11 +91,11 @@ function drawLED(c, cd) {
   x.font = "22px Georgia, serif"; x.fillStyle = "rgba(255,242,216,0.8)";
   x.fillText("3 DAYS \u00b7 4:30 PM DAILY", 256, 200);
 }
-function bannerTex(text, bg, fg) {
+function bannerTex(text, bg, fg, size) {
   const c = cnv(512, 96), x = c.getContext("2d");
   x.fillStyle = bg; x.fillRect(0, 0, 512, 96);
   x.strokeStyle = "rgba(255,183,46,0.6)"; x.lineWidth = 4; x.strokeRect(4, 4, 504, 88);
-  x.font = "bold 40px Georgia, serif"; x.fillStyle = fg; x.textAlign = "center"; x.textBaseline = "middle";
+  x.font = "bold " + (size || 40) + "px Georgia, serif"; x.fillStyle = fg; x.textAlign = "center"; x.textBaseline = "middle";
   x.fillText(text, 256, 50);
   return tex(c);
 }
@@ -378,7 +378,7 @@ export default function Ground3D() {
     const gate = new THREE.Group();
     add(gate, new THREE.CylinderGeometry(0.12, 0.14, 3.4, 6), M.truss, -2.6, 1.7, 0);
     add(gate, new THREE.CylinderGeometry(0.12, 0.14, 3.4, 6), M.truss, 2.6, 1.7, 0);
-    const gban = add(gate, new THREE.PlaneGeometry(5.0, 0.8), new THREE.MeshStandardMaterial({ map: bannerTex("WELCOME \u00b7 FAITH & FIRE", "#2a0f0f", "#ffdf9e"), emissive: 0x3a1608, emissiveIntensity: 0.6 }), 0, 3.05, 0);
+    const gban = add(gate, new THREE.PlaneGeometry(5.0, 0.8), new THREE.MeshStandardMaterial({ map: bannerTex("WELCOME \u00b7 FAITH & FIRE", "#2a0f0f", "#ffdf9e", 28), emissive: 0x3a1608, emissiveIntensity: 0.6 }), 0, 3.05, 0);
     gate.position.set(0, 0, 13.5); scene.add(gate);
     /* parked cars */
     const car = (x, z, c, ry) => { const g = new THREE.Group(); add(g, new THREE.BoxGeometry(2.5, 0.75, 1.25), new THREE.MeshStandardMaterial({ color: c, roughness: 0.4, metalness: 0.3 }), 0, 0.55, 0); add(g, new THREE.BoxGeometry(1.4, 0.55, 1.1), new THREE.MeshStandardMaterial({ color: c, roughness: 0.4, metalness: 0.3 }), -0.15, 1.2, 0); g.position.set(x, 0, z); g.rotation.y = ry; scene.add(g); };
