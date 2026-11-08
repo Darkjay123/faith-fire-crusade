@@ -460,10 +460,11 @@ export default function Ground3D() {
     const haze = [];
     const hazeTex = (() => { const c = cnv(256, 256), x = c.getContext("2d"); const g = x.createRadialGradient(128, 128, 8, 128, 128, 126); g.addColorStop(0, "rgba(255,235,205,0.85)"); g.addColorStop(0.5, "rgba(255,225,190,0.28)"); g.addColorStop(1, "rgba(255,225,190,0)"); x.fillStyle = g; x.fillRect(0, 0, 256, 256); return tex(c); })();
     const hazeMk = (hx, hy, hz, hs, ho, hd) => { const sp = new THREE.Sprite(new THREE.SpriteMaterial({ map: hazeTex, transparent: true, opacity: ho, blending: THREE.AdditiveBlending, depthWrite: false })); sp.position.set(hx, hy, hz); sp.scale.setScalar(hs); sp.userData.bx = hx; sp.userData.d = hd; scene.add(sp); haze.push(sp); };
-    hazeMk(0, 4.2, -13, 9, 0.10, 0.9); hazeMk(-4, 3.4, -9, 7, 0.07, 2.1); hazeMk(5, 3.2, -9, 6.5, 0.07, 4.0); hazeMk(0, 2.6, 2, 12, 0.05, 5.2); hazeMk(0, 6.5, -16, 6, 0.12, 3.1);
+    hazeMk(0, 4.2, -13, 9, 0.075, 0.9); hazeMk(-4, 3.4, -9, 7, 0.06, 2.1); hazeMk(5, 3.2, -9, 6.5, 0.06, 4.0); hazeMk(0, 2.6, 2, 12, 0.04, 5.2); hazeMk(0, 6.5, -16, 6, 0.09, 3.1);
     const haloMk = (hx, hy, hz, hs, ho, fogless) => { const sp = new THREE.Sprite(new THREE.SpriteMaterial({ map: hazeTex, transparent: true, opacity: ho, blending: THREE.AdditiveBlending, depthWrite: false, fog: !fogless })); sp.position.set(hx, hy, hz); sp.scale.setScalar(hs); scene.add(sp); return sp; };
-    haloMk(-13, 9.15, 7, 1.4, 0.22, true); haloMk(13, 9.15, 7, 1.4, 0.22, true);
-    haloMk(-30, 38, -60, 7, 0.45, true); haloMk(-30, 38, -60, 1.7, 0.95, true);
+    const moonTex = (() => { const c = cnv(256, 256), x = c.getContext("2d"); const halo = x.createRadialGradient(128, 128, 60, 128, 128, 126); halo.addColorStop(0, "rgba(222,228,255,0.35)"); halo.addColorStop(1, "rgba(222,228,255,0)"); x.fillStyle = halo; x.fillRect(0, 0, 256, 256); const disc = x.createRadialGradient(120, 120, 8, 128, 128, 64); disc.addColorStop(0, "rgba(252,252,255,1)"); disc.addColorStop(0.86, "rgba(242,242,250,0.95)"); disc.addColorStop(1, "rgba(232,234,248,0)"); x.beginPath(); x.arc(128, 128, 64, 0, 7); x.fillStyle = disc; x.fill(); return tex(c); })();
+    const moon = new THREE.Sprite(new THREE.SpriteMaterial({ map: moonTex, transparent: true, blending: THREE.AdditiveBlending, depthWrite: false, fog: false }));
+    moon.position.set(-30, 38, -60); moon.scale.setScalar(9); scene.add(moon);
     /* light sweep across the backdrop screen */
     const sweepTex = (() => { const c = cnv(128, 64), x = c.getContext("2d"); const g = x.createLinearGradient(0, 0, 128, 0); g.addColorStop(0, "rgba(255,200,120,0)"); g.addColorStop(0.5, "rgba(255,215,140,0.9)"); g.addColorStop(1, "rgba(255,200,120,0)"); x.fillStyle = g; x.fillRect(0, 0, 128, 64); return tex(c); })();
     const sweep = new THREE.Mesh(new THREE.PlaneGeometry(3.4, 4.7), new THREE.MeshBasicMaterial({ map: sweepTex, transparent: true, opacity: 0.13, blending: THREE.AdditiveBlending, depthWrite: false }));
