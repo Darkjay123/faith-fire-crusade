@@ -364,6 +364,30 @@ export default function Ground3D() {
       inst.instanceMatrix.needsUpdate = true; if (inst.instanceColor) inst.instanceColor.needsUpdate = true;
       scene.add(inst);
     };
+    const bakeSkinned = (mesh) => {
+      const g = mesh.geometry, sk = mesh.skeleton;
+      const geo = g.clone();
+      const pos = geo.attributes.position;
+      const si = g.attributes.skinIndex, sw = g.attributes.skinWeight;
+      const p0 = new THREE.Vector3(), out = new THREE.Vector3(), tmp = new THREE.Vector3(), M = new THREE.Matrix4();
+      const idx = [0, 0, 0, 0], wts = [0, 0, 0, 0];
+      for (let i = 0; i < pos.count; i++) {
+        p0.set(pos.getX(i), pos.getY(i), pos.getZ(i)).applyMatrix4(mesh.bindMatrix);
+        out.set(0, 0, 0);
+        idx[0] = si.getX(i); idx[1] = si.getY(i); idx[2] = si.getZ(i); idx[3] = si.getW(i);
+        wts[0] = sw.getX(i); wts[1] = sw.getY(i); wts[2] = sw.getZ(i); wts[3] = sw.getW(i);
+        for (let k = 0; k < 4; k++) {
+          const w = wts[k];
+          if (w === 0) continue;
+          M.multiplyMatrices(sk.bones[idx[k]].matrixWorld, sk.boneInverses[idx[k]]);
+          out.addScaledVector(tmp.copy(p0).applyMatrix4(M), w);
+        }
+        out.applyMatrix4(mesh.bindMatrixInverse);
+        pos.setXYZ(i, out.x, out.y, out.z);
+      }
+      geo.computeVertexNormals();
+      return geo;
+    };
     const bakePose = (gltf, mode) => {
       const sc = skeletonClone(gltf.scene);
       const byName = {};
@@ -375,7 +399,7 @@ export default function Ground3D() {
       sc.updateMatrixWorld(true);
       const geos = [];
       sc.traverse((o) => {
-        if (o.isSkinnedMesh) { const ge = o.bake().geometry.clone(); ["skinIndex", "skinWeight", "uv", "uv2"].forEach((k) => ge.deleteAttribute(k)); geos.push(ge); }
+        if (o.isSkinnedMesh) { const ge = bakeSkinned(o); ["skinIndex", "skinWeight", "uv", "uv2"].forEach((k) => ge.deleteAttribute(k)); geos.push(ge); }
         else if (o.isMesh) { const ge = o.geometry.clone(); ["skinIndex", "skinWeight", "uv", "uv2"].forEach((k) => ge.deleteAttribute(k)); geos.push(ge); }
       });
       if (!geos.length) return null;
