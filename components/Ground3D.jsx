@@ -1,6 +1,12 @@
 "use client";
 import { useEffect, useRef, useState } from "react";
 import * as THREE from "three";
+import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader.js";
+import { mergeGeometries } from "three/examples/jsm/utils/BufferGeometryUtils.js";
+import { EffectComposer } from "three/examples/jsm/postprocessing/EffectComposer.js";
+import { RenderPass } from "three/examples/jsm/postprocessing/RenderPass.js";
+import { UnrealBloomPass } from "three/examples/jsm/postprocessing/UnrealBloomPass.js";
+import { OutputPass } from "three/examples/jsm/postprocessing/OutputPass.js";
 import { SITE } from "../lib/config";
 
 /* The Ground 3D — a true 3D reproduction of the crusade ground at night,
@@ -221,7 +227,11 @@ export default function Ground3D() {
     const add = (m, g, mat, x, y, z, ry) => { const o = new THREE.Mesh(g, mat); o.position.set(x, y, z); if (ry) o.rotation.y = ry; m.add(o); return o; };
 
     /* ground */
-    const ground = new THREE.Mesh(new THREE.PlaneGeometry(90, 80), new THREE.MeshStandardMaterial({ map: dirtTex(), roughness: 1 }));
+    const texLoader = new THREE.TextureLoader();
+    const dirtMap = texLoader.load("tex/dirt_diff.jpg"); const dirtNor = texLoader.load("tex/dirt_nor.jpg"); const dirtRough = texLoader.load("tex/dirt_rough.jpg");
+    [dirtMap, dirtNor, dirtRough].forEach((t) => { t.wrapS = t.wrapT = THREE.RepeatWrapping; t.repeat.set(24, 22); });
+    dirtMap.colorSpace = THREE.SRGBColorSpace;
+    const ground = new THREE.Mesh(new THREE.PlaneGeometry(90, 80), new THREE.MeshStandardMaterial({ map: dirtMap, normalMap: dirtNor, normalScale: new THREE.Vector2(0.75, 0.75), roughnessMap: dirtRough, roughness: 1, color: 0xcdb494 }));
     ground.rotation.x = -Math.PI / 2; ground.position.z = 2; scene.add(ground);
     /* roads */
     const roadMat = new THREE.MeshStandardMaterial({ color: 0x3d2e1e, roughness: 1, transparent: true, opacity: 0.85 });
@@ -270,15 +280,10 @@ export default function Ground3D() {
     /* stairs */
     add(stage, new THREE.BoxGeometry(1.6, 0.3, 0.5), M.wood, 0, 0.15, -11.4); add(stage, new THREE.BoxGeometry(1.6, 0.6, 0.5), M.wood, 0, 0.3, -11.95);
 
-    /* ===== CROWD ===== */
-    const crowdBody = new THREE.InstancedMesh(new THREE.CapsuleGeometry(0.17, 0.5, 4, 8), new THREE.MeshStandardMaterial({ roughness: 0.95 }), CAP);
-    const crowdHead = new THREE.InstancedMesh(new THREE.SphereGeometry(0.115, 8, 8), new THREE.MeshStandardMaterial({ roughness: 0.9 }), CAP);
+    /* ===== CROWD: real low-poly people (Polyfork free GLBs, vertex-coloured) ===== */
     const chairMesh = new THREE.InstancedMesh(new THREE.BoxGeometry(0.46, 0.5, 0.44), new THREE.MeshStandardMaterial({ roughness: 0.8 }), CAP);
-    const standBody = new THREE.InstancedMesh(new THREE.CapsuleGeometry(0.17, 0.62, 4, 8), crowdBody.material, SCAP);
-    const standHead = new THREE.InstancedMesh(new THREE.SphereGeometry(0.115, 8, 8), crowdHead.material, SCAP);
     const dummy = new THREE.Object3D(); const col = new THREE.Color();
-    const clothes = [0x1c1214, 0x241a18, 0x301f1a, 0x3a2420, 0x181016, 0x2c2024, 0xe8ded0, 0x35506e, 0x54232e];
-    const skin = [0x6b4a38, 0x5c3d2c, 0x75543f, 0x4f3324];
+    const slots = { seated: [], standing: [] };
     let ci = 0;
     for (let row = 0; row < 12 && ci < CAP; row++) {
       const r = 12.5 + row * 2.05, spread = 0.72 + row * 0.055;
@@ -289,35 +294,58 @@ export default function Ground3D() {
         const x = Math.sin(a) * r + (Math.random() - 0.5) * 0.35;
         const z = -12 + Math.cos(a) * r + (Math.random() - 0.5) * 0.35;
         if (z > 20) continue;
-        dummy.position.set(x, 0.27, z); dummy.rotation.set(0, a, 0); dummy.updateMatrix();
-        chairMesh.setMatrixAt(ci, dummy.matrix);
-        chairMesh.setColorAt(ci, col.setHex(Math.random() < 0.45 ? 0xdfe4e8 : 0x2f6fb8));
-        const s = 0.92 + Math.random() * 0.22;
-        dummy.position.set(x, 0.5 + 0.36 * s, z); dummy.scale.setScalar(s); dummy.updateMatrix();
-        crowdBody.setMatrixAt(ci, dummy.matrix);
-        crowdBody.setColorAt(ci, col.setHex(clothes[Math.floor(Math.random() * clothes.length)]));
-        dummy.position.set(x, 0.5 + 0.95 * s, z); dummy.updateMatrix();
-        crowdHead.setMatrixAt(ci, dummy.matrix);
-        crowdHead.setColorAt(ci, col.setHex(skin[Math.floor(Math.random() * skin.length)]));
-        ci++;
+        const s = 0.93 + Math.random() * 0.2;
+        const yaw = a + (Math.random() - 0.5) * 0.6;
+        if (row < 4) slots.seated.push({ x, z, s, yaw });
+        else slots.standing.push({ x, z, s, yaw });
+        if (row < 4 || Math.random() < 0.3) {
+          dummy.position.set(x, 0.27, z); dummy.rotation.set(0, a, 0); dummy.updateMatrix();
+          chairMesh.setMatrixAt(ci, dummy.matrix);
+          chairMesh.setColorAt(ci, col.setHex(Math.random() < 0.45 ? 0xdfe4e8 : 0x2f6fb8));
+          ci++;
+        }
       }
     }
-    [crowdBody, crowdHead, chairMesh, standBody, standHead].forEach((m, idx) => { m.count = idx < 3 ? ci : Math.min(150, Math.floor(ci * 0.28)); scene.add(m); });
-    let si = 0;
-    const sc = Math.min(SCAP, Math.floor(ci * 0.28));
-    for (let i = 0; i < sc; i++) {
+    chairMesh.count = ci; scene.add(chairMesh);
+    for (let i = 0; i < SCAP; i++) {
       const side = Math.random() < 0.5 ? -1 : 1;
-      const x = side * (9 + Math.random() * 14), z = -6 + Math.random() * 24;
-      dummy.position.set(x, 0.85, z); dummy.rotation.set(0, side * (Math.PI / 2) + (Math.random() - 0.5) * 0.5, 0); dummy.scale.setScalar(0.9 + Math.random() * 0.25); dummy.updateMatrix();
-      standBody.setMatrixAt(si, dummy.matrix);
-      standBody.setColorAt(si, col.setHex(clothes[Math.floor(Math.random() * clothes.length)]));
-      dummy.position.set(x, 1.62, z); dummy.updateMatrix();
-      standHead.setMatrixAt(si, dummy.matrix);
-      standHead.setColorAt(si, col.setHex(skin[Math.floor(Math.random() * skin.length)]));
-      si++;
+      slots.standing.push({ x: side * (9 + Math.random() * 14), z: -6 + Math.random() * 24, s: 0.9 + Math.random() * 0.25, yaw: side * (Math.PI / 2) + (Math.random() - 0.5) * 0.5 });
     }
-    standBody.count = si; standHead.count = si;
-    [crowdBody, crowdHead, chairMesh, standBody, standHead].forEach((m) => { m.instanceMatrix.needsUpdate = true; if (m.instanceColor) m.instanceColor.needsUpdate = true; });
+    /* one instanced mesh per character model, filled as each model arrives */
+    const FLIP = true; // models face +z by default; stage is toward -z
+    const prep = (gltf) => {
+      const geos = [];
+      gltf.scene.traverse((o) => { if (o.isMesh) { const ge = o.geometry.clone(); ["skinIndex", "skinWeight", "uv", "uv2"].forEach((k) => ge.deleteAttribute(k)); geos.push(ge); } });
+      if (!geos.length) return null;
+      const geo = mergeGeometries(geos, false);
+      if (!geo) return null;
+      geo.computeBoundingBox(); const b = geo.boundingBox, c = new THREE.Vector3(); b.getCenter(c);
+      geo.translate(-c.x, -b.min.y, -c.z);
+      return geo;
+    };
+    const place = (file, spots) => {
+      new GLTFLoader().load("models/" + file + ".glb", (gltf) => {
+        if (disposed) return;
+        try {
+          const geo = prep(gltf);
+          if (!geo) return;
+          const inst = new THREE.InstancedMesh(geo, new THREE.MeshStandardMaterial({ vertexColors: true, roughness: 0.95, metalness: 0 }), spots.length);
+          spots.forEach((sp, i) => {
+            dummy.position.set(sp.x, sp.y || 0, sp.z);
+            dummy.rotation.set(0, (FLIP ? Math.PI : 0) + sp.yaw, 0);
+            dummy.scale.setScalar(sp.s || 1); dummy.updateMatrix();
+            inst.setMatrixAt(i, dummy.matrix);
+            const v = 0.66 + Math.random() * 0.42;
+            inst.setColorAt(i, col.setRGB(v, v * 0.94, v * 0.88));
+          });
+          inst.instanceMatrix.needsUpdate = true; if (inst.instanceColor) inst.instanceColor.needsUpdate = true;
+          scene.add(inst);
+        } catch (e) { /* one bad model never kills the world */ }
+      });
+    };
+    const standFiles = MOBILE ? ["spectator-d086fe", "villager-40255c"] : ["spectator-d086fe", "villager-40255c", "cafe-customer-ca7e8e", "townswoman-5aa87f"];
+    standFiles.forEach((f, i) => place(f, slots.standing.filter((_, j) => j % standFiles.length === i)));
+    place("seated-office-worker-854671", slots.seated.map((sp) => ({ ...sp, y: 0.18 })));
 
     /* ===== ENVIRONMENT ===== */
     const tent = (x, z, s) => { const g = new THREE.Group(); const c = add(g, new THREE.ConeGeometry(3.1, 2.6, 8), new THREE.MeshStandardMaterial({ color: 0xe9e2d4, roughness: 0.9, emissive: 0x35302a, emissiveIntensity: 0.35 }), 0, 1.7, 0); c.rotation.y = Math.PI / 8; add(g, new THREE.CylinderGeometry(0.03, 0.03, 1.2, 5), M.truss, 0, 3.4, 0); add(g, new THREE.BoxGeometry(0.25, 0.35, 0.02), new THREE.MeshStandardMaterial({ color: 0xff6a16, emissive: 0xff6a16, emissiveIntensity: 0.7 }), 0, 3.9, 0); g.position.set(x, 0, z); g.scale.setScalar(s); scene.add(g); };
@@ -354,19 +382,10 @@ export default function Ground3D() {
       g.position.set(x, 0, z); g.rotation.y = ry || 0; scene.add(g);
     };
     bldg(23, -8, 7, 5, 3.4, -0.2); bldg(25, 2, 6, 6, 4.2, 0.1); bldg(24, 12, 8, 5, 3.2, -0.15); bldg(-24, -4, 7, 5, 3.6, 0.2); bldg(-25, 10, 6, 5, 3, -0.1);
-    /* banana trees */
-    const leafMat = new THREE.MeshStandardMaterial({ color: 0x1d3a24, roughness: 1, side: THREE.DoubleSide });
-    const tree = (x, z, s) => {
-      const g = new THREE.Group();
-      add(g, new THREE.CylinderGeometry(0.1, 0.16, 2.6, 6), new THREE.MeshStandardMaterial({ color: 0x3a2b1c }), 0, 1.3, 0);
-      for (let i = 0; i < 7; i++) {
-        const l = add(g, new THREE.PlaneGeometry(2.6, 0.55), leafMat, 0, 2.6, 0);
-        l.rotation.y = (i / 7) * Math.PI * 2; l.rotation.z = 0.9; l.translateX(1.1);
-      }
-      g.position.set(x, 0, z); g.scale.setScalar(s); scene.add(g);
-    };
-    tree(-21, -14, 1.1); tree(-23, -6, 1.2); tree(-22, 2, 1); tree(-20, 14, 1.1); tree(-24, 20, 1);
-    tree(22, -16, 1.2); tree(20, -20, 1); tree(-8, -22, 1.1); tree(6, -22, 1.2); tree(0, -24, 1);
+    /* palm trees, market stalls and stacks: real low-poly models */
+    place("palm-tree-a307da", [[-21, -14, 1.15], [-23, -6, 1.25], [-22, 2, 1.05], [-20, 14, 1.15], [-24, 20, 1], [22, -16, 1.3], [20, -20, 1], [-8, -22, 1.1], [6, -22, 1.3], [0, -24, 1]]);
+    place("market-stall-94937d", [[-16.5, -9, 1.15, 0.5], [16, -13, 1.1, -0.6], [17.5, 6, 1, 2.2]]);
+    place("portable-party-speaker-92cdc1", [[-4.9, -12.2, 1.35, 0], [4.9, -12.2, 1.35, Math.PI]]);
     /* container + fence + banners */
     const cont = new THREE.Mesh(new THREE.BoxGeometry(9, 2.4, 2.4), new THREE.MeshStandardMaterial({ map: containerTex(), roughness: 0.85 }));
     cont.position.set(18.5, 1.2, -2); cont.rotation.y = 0.1; scene.add(cont);
@@ -400,6 +419,19 @@ export default function Ground3D() {
     const emGeo = new THREE.BufferGeometry(); emGeo.setAttribute("position", new THREE.BufferAttribute(emPos, 3));
     const embers = new THREE.Points(emGeo, new THREE.PointsMaterial({ color: 0xffa04a, size: 0.09, transparent: true, opacity: 0.85, blending: THREE.AdditiveBlending, depthWrite: false }));
     scene.add(embers);
+
+    /* cinematic bloom on desktop */
+    let composer = null;
+    if (!MOBILE) {
+      try {
+        composer = new EffectComposer(renderer);
+        composer.setPixelRatio(renderer.getPixelRatio());
+        composer.setSize(box.clientWidth, box.clientHeight);
+        composer.addPass(new RenderPass(scene, camera));
+        composer.addPass(new UnrealBloomPass(new THREE.Vector2(box.clientWidth, box.clientHeight), 0.55, 0.85, 0.68));
+        composer.addPass(new OutputPass());
+      } catch (e) { composer = null; }
+    }
 
     /* camera + controls */
     const wide = MOBILE ? WIDE_M : WIDE;
@@ -479,7 +511,7 @@ export default function Ground3D() {
         btn.style.left = `${(hv.x * 0.5 + 0.5) * 100}%`;
         btn.style.top = `${(-hv.y * 0.5 + 0.5) * 100}%`;
       }
-      renderer.render(scene, camera);
+      if (composer) composer.render(); else renderer.render(scene, camera);
       } catch (err) {
         disposed = true; cancelAnimationFrame(raf);
         setFailed("3D frame error: " + (err && err.message ? err.message : String(err)));
@@ -494,6 +526,7 @@ export default function Ground3D() {
       const w = box.clientWidth || innerWidth, h = box.clientHeight || innerHeight;
       if (renderer.domElement.width !== Math.round(w * renderer.getPixelRatio()) || renderer.domElement.height !== Math.round(h * renderer.getPixelRatio())) renderer.setSize(w, h);
       const a = w / h;
+      if (composer) composer.setSize(w, h);
       if (isFinite(a) && Math.abs(camera.aspect - a) > 0.001) { camera.aspect = a; camera.updateProjectionMatrix(); }
     };
     const onResize = () => fixSize();
