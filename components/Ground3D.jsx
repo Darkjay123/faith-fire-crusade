@@ -368,8 +368,9 @@ export default function Ground3D() {
       const sc = skeletonClone(gltf.scene);
       const byName = {};
       sc.traverse((o) => { if (o.isBone) byName[o.name.toLowerCase().replace(/mixamorig/g, "").replace(/[^a-z]/g, "")] = o; });
-      const a = mode === 1 ? 2.5 : mode === 2 ? 1.05 : 1.3;
-      ["leftarm", "rightarm"].forEach((k, i) => { const b = byName[k]; if (b) b.rotation.z += i ? a : -a; });
+      const la = mode === 1 ? 1.7 : mode === 2 ? 0.9 : -1.3;
+      if (byName.leftarm) byName.leftarm.rotation.z += la;
+      if (byName.rightarm) byName.rightarm.rotation.z += -la;
       ["leftforearm", "rightforearm"].forEach((k) => { const b = byName[k]; if (b) b.rotation.x += mode === 1 ? -0.35 : -0.12; });
       sc.updateMatrixWorld(true);
       const geos = [];

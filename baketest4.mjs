@@ -1,0 +1,21 @@
+import * as THREE from 'three';
+import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';
+import { clone as skeletonClone } from 'three/examples/jsm/utils/SkeletonUtils.js';
+import fs from 'fs';
+const buf = fs.readFileSync('public/models/spectator-d086fe.glb');
+const gltf = await new GLTFLoader().parseAsync(buf.buffer.slice(buf.byteOffset, buf.byteOffset+buf.byteLength), '');
+const sc = skeletonClone(gltf.scene);
+sc.updateMatrixWorld(true);
+let mesh = null; sc.traverse(o => { if (o.isSkinnedMesh && !mesh) mesh = o; });
+const sk = mesh.skeleton;
+const p = mesh.geometry.attributes.position;
+const v = new THREE.Vector3();
+const apply = mesh.applyBoneTransform.bind(mesh);
+for (const i of [0, 100, 500, 1000, 2000]) { apply(i, v); console.log('v' + i, p.getX(i).toFixed(2), p.getY(i).toFixed(2), p.getZ(i).toFixed(2), '->', v.x.toFixed(2), v.y.toFixed(2), v.z.toFixed(2)); }
+const b0 = sk.bones[0];
+console.log('bone0 matrixWorld:', b0.matrixWorld.elements.slice(0,4).map(x=>x.toFixed(2)).join(','), 'pos:', b0.matrixWorld.getPosition().toArray().map(x=>x.toFixed(2)).join(','));
+console.log('boneInverse0:', sk.boneInverses[0].elements.slice(12,16).map(x=>x.toFixed(2)).join(','));
+const si = mesh.geometry.attributes.skinIndex, sw = mesh.geometry.attributes.skinWeight;
+console.log('skin v0:', si.getX(0), si.getY(0), si.getZ(0), si.getW(0), '| w:', sw.getX(0).toFixed(2), sw.getY(0).toFixed(2), sw.getZ(0).toFixed(2), sw.getW(0).toFixed(2));
+console.log('bones[0] === cloned scene bone?', sc.getObjectByName(b0.name) === b0);
+console.log('mesh.parent chain has bones? name:', mesh.parent.type, mesh.parent.name || '(unnamed)');

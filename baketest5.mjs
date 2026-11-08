@@ -1,0 +1,13 @@
+import * as THREE from 'three';
+import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';
+import fs from 'fs';
+const buf = fs.readFileSync('public/models/spectator-d086fe.glb');
+const gltf = await new GLTFLoader().parseAsync(buf.buffer.slice(buf.byteOffset, buf.byteOffset+buf.byteLength), '');
+let mesh = null; gltf.scene.traverse(o => { if (o.isSkinnedMesh && !mesh) mesh = o; });
+const g = mesh.geometry;
+console.log('attrs:', Object.keys(g.attributes).join(', '));
+const si = g.attributes.skinIndex, sw = g.attributes.skinWeight;
+console.log('skinIndex count:', si ? si.count : 'MISSING', 'skinWeight count:', sw ? sw.count : 'MISSING');
+if (sw) for (const i of [0, 100, 500]) console.log('sw' + i + ':', sw.getX(i).toFixed(2), sw.getY(i).toFixed(2), sw.getZ(i).toFixed(2), sw.getW(i).toFixed(2), '| si:', si.getX(i), si.getY(i), si.getZ(i), si.getW(i));
+console.log('bindMatrix row0:', mesh.bindMatrix.elements.slice(0,4).map(x=>x.toFixed(2)).join(','));
+console.log('bone0.matrixWorld row0:', mesh.skeleton.bones[0].matrixWorld.elements.slice(0,4).map(x=>x.toFixed(2)).join(','));
