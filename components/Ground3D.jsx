@@ -786,7 +786,7 @@ export default function Ground3D() {
           <button className="g-tour-end" onClick={() => { setTour(-1); go(null, true); }}>End walk</button>
         </aside>
       ) : null}
-      {st ? (
+      {st && tour < 0 ? (
         <aside className="g-panel" role="dialog" aria-label={st.label}>
           <button className="g-close" onClick={() => go(null)} aria-label="Back to the whole ground">&larr; Whole ground</button>
           {station === "stage" ? (
