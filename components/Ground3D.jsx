@@ -629,6 +629,21 @@ export default function Ground3D() {
         setFailed("3D frame error: " + (err && err.message ? err.message : String(err)));
       }
     };
+    if (typeof window !== "undefined") {
+      window.__g3d = { scene, camera, renderer, composer };
+      const dh = new URLSearchParams(location.search).get("dh");
+      if (dh) {
+        const tests = {
+          beams: (o) => o.isMesh && o.material && o.material.blending === 2,
+          sprites: (o) => o.isSprite,
+          basic: (o) => o.isMesh && o.material && o.material.type === "MeshBasicMaterial",
+          emissive: (o) => o.isMesh && o.material && (o.material.emissiveIntensity || 0) > 0.3,
+          truss: (o) => o.isMesh && o.material === M.truss,
+        };
+        const f = tests[dh];
+        if (f) scene.traverse((o) => { if (f(o)) o.visible = false; });
+      }
+    }
     raf = requestAnimationFrame(loop);
 
     /* LED refresh bridge */
