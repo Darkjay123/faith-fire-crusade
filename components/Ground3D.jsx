@@ -2,6 +2,7 @@
 import { useEffect, useRef, useState } from "react";
 import * as THREE from "three";
 import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader.js";
+import { clone as skeletonClone } from "three/examples/jsm/utils/SkeletonUtils.js";
 import { mergeGeometries } from "three/examples/jsm/utils/BufferGeometryUtils.js";
 import { EffectComposer } from "three/examples/jsm/postprocessing/EffectComposer.js";
 import { RenderPass } from "three/examples/jsm/postprocessing/RenderPass.js";
@@ -212,8 +213,8 @@ export default function Ground3D() {
     scene.add(new THREE.AmbientLight(0xffffff, 0.22));
     const stageWash1 = new THREE.SpotLight(0xff4fd8, 400, 60, 0.55, 0.6); stageWash1.position.set(-4.5, 6.8, -15); stageWash1.target.position.set(0, 2.2, -12); scene.add(stageWash1, stageWash1.target);
     const stageWash2 = new THREE.SpotLight(0x4f7dff, 350, 60, 0.55, 0.6); stageWash2.position.set(4.5, 6.8, -15); stageWash2.target.position.set(0, 2.2, -12); scene.add(stageWash2, stageWash2.target);
-    const crowdWashL = new THREE.SpotLight(0xfff2d8, 1600, 90, 0.5, 0.7); crowdWashL.position.set(-13, 9, 6); crowdWashL.target.position.set(-2, 0, 2); scene.add(crowdWashL, crowdWashL.target);
-    const crowdWashR = new THREE.SpotLight(0xfff2d8, 1600, 90, 0.5, 0.7); crowdWashR.position.set(13, 9, 6); crowdWashR.target.position.set(2, 0, 2); scene.add(crowdWashR, crowdWashR.target);
+    const crowdWashL = new THREE.SpotLight(0xfff2d8, 950, 90, 0.5, 0.7); crowdWashL.position.set(-13, 9, 6); crowdWashL.target.position.set(-2, 0, 2); scene.add(crowdWashL, crowdWashL.target);
+    const crowdWashR = new THREE.SpotLight(0xfff2d8, 950, 90, 0.5, 0.7); crowdWashR.position.set(13, 9, 6); crowdWashR.target.position.set(2, 0, 2); scene.add(crowdWashR, crowdWashR.target);
     const moon = new THREE.DirectionalLight(0x8090b8, 0.6); moon.position.set(-30, 40, 20); scene.add(moon);
 
     /* materials */
@@ -348,9 +349,57 @@ export default function Ground3D() {
         } catch (e) { /* one bad model never kills the world */ }
       });
     };
+    /* people: bake each rig into a natural pose (arms down, raised in worship, half-raised) */
+    const personMat = new THREE.MeshStandardMaterial({ vertexColors: true, roughness: 0.92, metalness: 0 });
+    const fillInst = (geo, take, yOff) => {
+      const inst = new THREE.InstancedMesh(geo, personMat, take.length);
+      take.forEach((sp, i) => {
+        dummy.position.set(sp.x, sp.y || yOff, sp.z);
+        dummy.rotation.set(0, (FLIP ? Math.PI : 0) + sp.yaw, 0);
+        dummy.scale.setScalar(sp.s || 1); dummy.updateMatrix();
+        inst.setMatrixAt(i, dummy.matrix);
+        const v = 0.72 + Math.random() * 0.4;
+        inst.setColorAt(i, col.setRGB(v, v * 0.95, v * 0.9));
+      });
+      inst.instanceMatrix.needsUpdate = true; if (inst.instanceColor) inst.instanceColor.needsUpdate = true;
+      scene.add(inst);
+    };
+    const bakePose = (gltf, mode) => {
+      const sc = skeletonClone(gltf.scene);
+      const byName = {};
+      sc.traverse((o) => { if (o.isBone) byName[o.name.toLowerCase().replace(/mixamorig/g, "").replace(/[^a-z]/g, "")] = o; });
+      const a = mode === 1 ? 2.5 : mode === 2 ? 1.05 : 1.3;
+      ["leftarm", "rightarm"].forEach((k, i) => { const b = byName[k]; if (b) b.rotation.z += i ? a : -a; });
+      ["leftforearm", "rightforearm"].forEach((k) => { const b = byName[k]; if (b) b.rotation.x += mode === 1 ? -0.35 : -0.12; });
+      sc.updateMatrixWorld(true);
+      const geos = [];
+      sc.traverse((o) => {
+        if (o.isSkinnedMesh) { const ge = o.bake().geometry.clone(); ["skinIndex", "skinWeight", "uv", "uv2"].forEach((k) => ge.deleteAttribute(k)); geos.push(ge); }
+        else if (o.isMesh) { const ge = o.geometry.clone(); ["skinIndex", "skinWeight", "uv", "uv2"].forEach((k) => ge.deleteAttribute(k)); geos.push(ge); }
+      });
+      if (!geos.length) return null;
+      const geo = mergeGeometries(geos, false);
+      if (!geo) return null;
+      geo.computeBoundingBox(); const b = geo.boundingBox, c = new THREE.Vector3(); b.getCenter(c);
+      geo.translate(-c.x, -b.min.y, -c.z);
+      return geo;
+    };
+    const placePeople = (file, list) => {
+      new GLTFLoader().load("models/" + file + ".glb", (gltf) => {
+        if (disposed) return;
+        try {
+          [[0, (j) => (j % 5) <= 2], [1, (j) => (j % 5) === 3], [2, (j) => (j % 5) === 4]].forEach(([mode, pick]) => {
+            const take = list.filter((_, j) => pick(j));
+            if (!take.length) return;
+            const geo = bakePose(gltf, mode);
+            if (geo) fillInst(geo, take, 0);
+          });
+        } catch (e) { /* one bad model never kills the world */ }
+      });
+    };
     const standFiles = MOBILE ? ["spectator-d086fe", "villager-40255c"] : ["spectator-d086fe", "villager-40255c", "cafe-customer-ca7e8e", "townswoman-5aa87f"];
-    standFiles.forEach((f, i) => place(f, slots.standing.filter((_, j) => j % standFiles.length === i)));
-    place("seated-office-worker-854671", slots.seated.map((sp) => ({ ...sp, y: 0.18 })));
+    standFiles.forEach((f) => placePeople(f, slots.standing));
+    placePeople("seated-office-worker-854671", slots.seated.map((sp) => ({ ...sp, y: 0.18 })));
 
     /* ===== ENVIRONMENT ===== */
     const tent = (x, z, s) => { const g = new THREE.Group(); const c = add(g, new THREE.ConeGeometry(3.1, 2.6, 8), new THREE.MeshStandardMaterial({ color: 0xe9e2d4, roughness: 0.9, emissive: 0x35302a, emissiveIntensity: 0.35 }), 0, 1.7, 0); c.rotation.y = Math.PI / 8; add(g, new THREE.CylinderGeometry(0.03, 0.03, 1.2, 5), M.truss, 0, 3.4, 0); add(g, new THREE.BoxGeometry(0.25, 0.35, 0.02), new THREE.MeshStandardMaterial({ color: 0xff6a16, emissive: 0xff6a16, emissiveIntensity: 0.7 }), 0, 3.9, 0); g.position.set(x, 0, z); g.scale.setScalar(s); scene.add(g); };
@@ -363,8 +412,8 @@ export default function Ground3D() {
       add(g, new THREE.BoxGeometry(1.7, 0.35, 0.35), M.truss, 0, 9.1, 0);
       const heads = [-0.6, 0.6].map((o) => add(g, new THREE.BoxGeometry(0.5, 0.3, 0.4), M.black, o, 8.95, 0.1));
       g.position.set(x, 0, z); g.lookAt(tx, 0, tz); g.rotation.x = 0; g.rotation.z = 0;
-      const spot = new THREE.SpotLight(0xfff2d8, 2500, 110, 0.42, 0.55); spot.position.set(x, 9, z); spot.target.position.set(tx, 0, tz); scene.add(spot, spot.target);
-      const beam = new THREE.Mesh(new THREE.ConeGeometry(5.5, 15, 20, 1, true), new THREE.MeshBasicMaterial({ color: 0xffe9c0, transparent: true, opacity: 0.055, side: THREE.DoubleSide, blending: THREE.AdditiveBlending, depthWrite: false }));
+      const spot = new THREE.SpotLight(0xfff2d8, 1700, 110, 0.42, 0.55); spot.position.set(x, 9, z); spot.target.position.set(tx, 0, tz); scene.add(spot, spot.target);
+      const beam = new THREE.Mesh(new THREE.ConeGeometry(5.5, 15, 20, 1, true), new THREE.MeshBasicMaterial({ color: 0xffe9c0, transparent: true, opacity: 0.032, side: THREE.DoubleSide, blending: THREE.AdditiveBlending, depthWrite: false }));
       beam.position.set(x, 9, z);
       const dir = new THREE.Vector3(tx - x, -9, tz - z).normalize();
       beam.quaternion.setFromUnitVectors(new THREE.Vector3(0, -1, 0), dir.clone().normalize());
@@ -402,7 +451,7 @@ export default function Ground3D() {
     const gate = new THREE.Group();
     add(gate, new THREE.CylinderGeometry(0.12, 0.14, 3.4, 6), M.truss, -2.6, 1.7, 0);
     add(gate, new THREE.CylinderGeometry(0.12, 0.14, 3.4, 6), M.truss, 2.6, 1.7, 0);
-    const gban = add(gate, new THREE.PlaneGeometry(5.0, 0.8), new THREE.MeshStandardMaterial({ map: bannerTex("WELCOME \u00b7 FAITH & FIRE", "#2a0f0f", "#ffdf9e", 28), emissive: 0x6a2a10, emissiveIntensity: 1.5 }), 0, 3.05, 0);
+    const gban = add(gate, new THREE.PlaneGeometry(5.0, 0.8), new THREE.MeshStandardMaterial({ map: bannerTex("WELCOME \u00b7 FAITH & FIRE", "#2a0f0f", "#ffdf9e", 28), emissive: 0x7a3a12, emissiveIntensity: 2.2 }), 0, 3.05, 0);
     gate.position.set(0, 0, 13.5); scene.add(gate);
     /* parked cars */
     const car = (x, z, c, ry) => { const g = new THREE.Group(); add(g, new THREE.BoxGeometry(2.5, 0.75, 1.25), new THREE.MeshStandardMaterial({ color: c, roughness: 0.4, metalness: 0.3 }), 0, 0.55, 0); add(g, new THREE.BoxGeometry(1.4, 0.55, 1.1), new THREE.MeshStandardMaterial({ color: c, roughness: 0.4, metalness: 0.3 }), -0.15, 1.2, 0); g.position.set(x, 0, z); g.rotation.y = ry; scene.add(g); };
@@ -433,7 +482,7 @@ export default function Ground3D() {
         composer.setPixelRatio(renderer.getPixelRatio());
         composer.setSize(box.clientWidth, box.clientHeight);
         composer.addPass(new RenderPass(scene, camera));
-        composer.addPass(new UnrealBloomPass(new THREE.Vector2(box.clientWidth, box.clientHeight), 0.55, 0.85, 0.68));
+        composer.addPass(new UnrealBloomPass(new THREE.Vector2(box.clientWidth, box.clientHeight), 0.32, 0.6, 0.85));
         composer.addPass(new OutputPass());
       } catch (e) { composer = null; }
     }
