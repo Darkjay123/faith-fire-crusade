@@ -10,12 +10,13 @@ import { SITE } from "../lib/config";
 const STATIONS = {
   stage: { fb: ["57%","43%"], label: "The Stage", pos: [0, 3.6, -2.5], tgt: [0, 3.0, -14.5], anchor: [0, 4.4, -13] },
   screen: { fb: ["33%","24%"], label: "Programme", pos: [4.2, 4.0, -5.5], tgt: [5.4, 3.8, -14.5], anchor: [5.4, 5.2, -14.6] },
-  gate: { fb: ["55%","88%"], label: "The Gate", pos: [2.5, 4.5, 27.5], tgt: [0, 2.2, 21], anchor: [0, 3.4, 21] },
+  gate: { fb: ["55%","88%"], label: "The Gate", pos: [2.5, 4.5, 27.5], tgt: [0, 2.2, 21], anchor: [0, 4.9, 21] },
   fire: { fb: ["30%","78%"], label: "Fire Altars", pos: [-8.0, 3.4, 9.0], tgt: [-11, 1.2, 3], anchor: [-11, 2.4, 3] },
   gallery: { fb: ["82%","60%"], label: "Moments", pos: [10, 3.2, 11], tgt: [0, 1.6, 0], anchor: [10, 2.6, 9] },
   roads: { fb: ["12%","88%"], label: "Directions", pos: [0, 26, 10], tgt: [0, 0, -6], anchor: [-7, 0.8, 13] },
 };
 const WIDE = { pos: [0, 9.5, 31], tgt: [0, 2.5, -10] };
+const WIDE_M = { pos: [0, 5.8, 25], tgt: [0, 3.4, -7] };
 const PHOTOS = [
   ["img/ground_crowd_2024.jpg", "The ground fills up — night one"],
   ["img/ground_crowd_2025.jpg", "Hands raised across the field"],
@@ -401,12 +402,13 @@ export default function Ground3D() {
     scene.add(embers);
 
     /* camera + controls */
-    camera.position.set(...WIDE.pos);
-    const look = new THREE.Vector3(...WIDE.tgt);
+    const wide = MOBILE ? WIDE_M : WIDE;
+    camera.position.set(...wide.pos);
+    const look = new THREE.Vector3(...wide.tgt);
     const sph = { radius: Math.hypot(camera.position.x - look.x, camera.position.y - look.y, camera.position.z - look.z), theta: Math.atan2(camera.position.x - look.x, camera.position.z - look.z), phi: Math.acos((camera.position.y - look.y) / camera.position.distanceTo(look)) };
     let flight = null;
     const flyTo = (p, t) => { flight = { p: p.slice(), t: t.slice(), k: 0 }; };
-    handle.flyTo = (k) => { const s = k ? STATIONS[k] : WIDE; flyTo(s.pos, s.tgt); };
+    handle.flyTo = (k) => { const s = k ? STATIONS[k] : (MOBILE ? WIDE_M : WIDE); flyTo(s.pos, s.tgt); };
     let dragging = false, moved = false, px = 0, py = 0, pinch = 0;
     const el = renderer.domElement;
     const onDown = (e) => { dragging = true; moved = false; px = e.clientX; py = e.clientY; flight = null; };
