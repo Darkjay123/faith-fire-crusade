@@ -80,8 +80,8 @@ function backdropTex() {
   for (let i = 0; i < 14; i++) { const a = (i / 13) * Math.PI - Math.PI / 2; x.beginPath(); x.moveTo(512, 240); x.lineTo(512 + Math.cos(a) * 680, 240 + Math.sin(a) * 480); x.stroke(); }
   x.font = "bold 88px Georgia, serif"; x.fillStyle = "rgba(255,225,170,0.92)"; x.textAlign = "center";
   x.fillText("FAITH \u0026 FIRE", 512, 300);
-  x.font = "36px Georgia, serif"; x.fillStyle = "rgba(255,210,160,0.78)";
-  x.fillText("DELSU PRAYS \u00b7 THE 9TH EDITION", 512, 368);
+  x.font = "44px Georgia, serif"; x.fillStyle = "rgba(255,214,168,0.92)";
+  x.fillText("DELSU PRAYS \u00b7 THE 9TH EDITION", 512, 374);
   return tex(c);
 }
 
@@ -462,8 +462,8 @@ export default function Ground3D() {
     const hazeMk = (hx, hy, hz, hs, ho, hd) => { const sp = new THREE.Sprite(new THREE.SpriteMaterial({ map: hazeTex, transparent: true, opacity: ho, blending: THREE.AdditiveBlending, depthWrite: false })); sp.position.set(hx, hy, hz); sp.scale.setScalar(hs); sp.userData.bx = hx; sp.userData.d = hd; scene.add(sp); haze.push(sp); };
     hazeMk(0, 4.2, -13, 9, 0.10, 0.9); hazeMk(-4, 3.4, -9, 7, 0.07, 2.1); hazeMk(5, 3.2, -9, 6.5, 0.07, 4.0); hazeMk(0, 2.6, 2, 12, 0.05, 5.2); hazeMk(0, 6.5, -16, 6, 0.12, 3.1);
     const haloMk = (hx, hy, hz, hs, ho, fogless) => { const sp = new THREE.Sprite(new THREE.SpriteMaterial({ map: hazeTex, transparent: true, opacity: ho, blending: THREE.AdditiveBlending, depthWrite: false, fog: !fogless })); sp.position.set(hx, hy, hz); sp.scale.setScalar(hs); scene.add(sp); return sp; };
-    haloMk(-13, 9.15, 7, 2.2, 0.4, true); haloMk(13, 9.15, 7, 2.2, 0.4, true);
-    haloMk(-30, 38, -60, 7, 0.5, true); haloMk(-30, 38, -60, 2.4, 0.85, true);
+    haloMk(-13, 9.15, 7, 1.4, 0.22, true); haloMk(13, 9.15, 7, 1.4, 0.22, true);
+    haloMk(-30, 38, -60, 7, 0.45, true); haloMk(-30, 38, -60, 1.7, 0.95, true);
     /* light sweep across the backdrop screen */
     const sweepTex = (() => { const c = cnv(128, 64), x = c.getContext("2d"); const g = x.createLinearGradient(0, 0, 128, 0); g.addColorStop(0, "rgba(255,200,120,0)"); g.addColorStop(0.5, "rgba(255,215,140,0.9)"); g.addColorStop(1, "rgba(255,200,120,0)"); x.fillStyle = g; x.fillRect(0, 0, 128, 64); return tex(c); })();
     const sweep = new THREE.Mesh(new THREE.PlaneGeometry(3.4, 4.7), new THREE.MeshBasicMaterial({ map: sweepTex, transparent: true, opacity: 0.13, blending: THREE.AdditiveBlending, depthWrite: false }));
