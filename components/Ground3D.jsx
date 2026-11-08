@@ -23,7 +23,7 @@ const STATIONS = {
   roads: { fb: ["12%","88%"], label: "Directions", pos: [0, 26, 10], tgt: [0, 0, -6], anchor: [-7, 0.8, 13] },
 };
 const WIDE = { pos: [0, 9.5, 31], tgt: [0, 2.5, -10] };
-const WIDE_M = { pos: [0, 4.2, 10], tgt: [0, 4.8, -13.4] };
+const WIDE_M = { pos: [0, 7.2, 26], tgt: [0, 1.2, -7] };
 const PHOTOS = [
   ["img/ground_crowd_2024.jpg", "The ground fills up — night one"],
   ["img/ground_crowd_2025.jpg", "Hands raised across the field"],
@@ -195,7 +195,7 @@ export default function Ground3D() {
     const scene = new THREE.Scene();
     scene.background = new THREE.Color(0x050308);
     scene.fog = new THREE.FogExp2(0x070409, 0.016);
-    const camera = new THREE.PerspectiveCamera(MOBILE ? 32 : 58, box.clientWidth / box.clientHeight, 0.1, 220);
+    const camera = new THREE.PerspectiveCamera(58, box.clientWidth / box.clientHeight, 0.1, 220);
 
     /* sky: stars + faint moon */
     {
@@ -519,7 +519,7 @@ export default function Ground3D() {
     const sph = { radius: Math.hypot(camera.position.x - look.x, camera.position.y - look.y, camera.position.z - look.z), theta: Math.atan2(camera.position.x - look.x, camera.position.z - look.z), phi: Math.acos((camera.position.y - look.y) / camera.position.distanceTo(look)) };
     let flight = null;
     const flyTo = (p, t) => { flight = { p: p.slice(), t: t.slice(), k: 0 }; };
-    const setFov = (k) => { const f = k ? (MOBILE ? 46 : 58) : (MOBILE ? 32 : 58); if (camera.fov !== f) { camera.fov = f; camera.updateProjectionMatrix(); } };
+    const setFov = (k) => { const f = k ? (MOBILE ? 46 : 58) : 58; if (camera.fov !== f) { camera.fov = f; camera.updateProjectionMatrix(); } };
     handle.flyTo = (k) => { setFov(k); const s = k ? STATIONS[k] : (MOBILE ? WIDE_M : WIDE); flyTo(s.pos, s.tgt); };
     let dragging = false, moved = false, px = 0, py = 0, pinch = 0;
     const el = renderer.domElement;
