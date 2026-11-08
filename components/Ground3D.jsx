@@ -161,6 +161,11 @@ export default function Ground3D() {
     return () => document.body.classList.remove("in-ground");
   }, [mode]);
   useEffect(() => { const t = setTimeout(() => setHint(false), 8000); return () => clearTimeout(t); }, []);
+  /* test hook: ?tour=1 auto-starts the walkthrough */
+  useEffect(() => {
+    if (mode !== "ground") return;
+    if (typeof URLSearchParams !== "undefined" && new URLSearchParams(location.search).get("tour") === "1") { setSound(false); setTour(0); }
+  }, [mode]);
   useEffect(() => { if (mode !== "ground") return; const t = setInterval(() => setCd(msToNext() || "LIVE"), 1000); setCd(msToNext() || "LIVE"); return () => clearInterval(t); }, [mode]);
   useEffect(() => { cdRef.current = cd; }, [cd]);
 
