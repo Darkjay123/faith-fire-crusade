@@ -168,12 +168,14 @@ export default function Ground3D() {
     if (mode !== "ground" || !boxRef.current) return;
     const box = boxRef.current;
     let renderer, raf, disposed = false;
+    const MOBILE = (typeof matchMedia !== "undefined" && matchMedia("(max-width: 820px)").matches) || (typeof navigator !== "undefined" && navigator.maxTouchPoints > 1 && Math.min(screen.width, screen.height) < 820);
+    const CAP = MOBILE ? 380 : 640, SCAP = MOBILE ? 90 : 150;
     try {
     const handle = { flyTo: null, drawLED: null };
     sceneRef.current = handle;
 
-      renderer = new THREE.WebGLRenderer({ antialias: true, powerPreference: "high-performance" });
-    renderer.setPixelRatio(Math.min(devicePixelRatio || 1, 1.6));
+      renderer = new THREE.WebGLRenderer({ antialias: !MOBILE, powerPreference: MOBILE ? "low-power" : "high-performance" });
+    renderer.setPixelRatio(Math.min(devicePixelRatio || 1, MOBILE ? 1.2 : 1.6));
     renderer.setSize(box.clientWidth, box.clientHeight);
     renderer.toneMapping = THREE.ACESFilmicToneMapping;
     renderer.toneMappingExposure = 1.15;
@@ -189,7 +191,7 @@ export default function Ground3D() {
 
     /* sky: stars + faint moon */
     {
-      const n = 420, pos = new Float32Array(n * 3);
+      const n = MOBILE ? 260 : 420, pos = new Float32Array(n * 3);
       for (let i = 0; i < n; i++) {
         const th = Math.random() * Math.PI * 2;
         pos[i * 3] = (Math.random() - 0.5) * 240; pos[i * 3 + 1] = 14 + Math.random() * 110; pos[i * 3 + 2] = (Math.random() - 0.5) * 240;
@@ -268,19 +270,19 @@ export default function Ground3D() {
     add(stage, new THREE.BoxGeometry(1.6, 0.3, 0.5), M.wood, 0, 0.15, -11.4); add(stage, new THREE.BoxGeometry(1.6, 0.6, 0.5), M.wood, 0, 0.3, -11.95);
 
     /* ===== CROWD ===== */
-    const crowdBody = new THREE.InstancedMesh(new THREE.CapsuleGeometry(0.17, 0.5, 4, 8), new THREE.MeshStandardMaterial({ roughness: 0.95 }), 640);
-    const crowdHead = new THREE.InstancedMesh(new THREE.SphereGeometry(0.115, 8, 8), new THREE.MeshStandardMaterial({ roughness: 0.9 }), 640);
-    const chairMesh = new THREE.InstancedMesh(new THREE.BoxGeometry(0.46, 0.5, 0.44), new THREE.MeshStandardMaterial({ roughness: 0.8 }), 640);
-    const standBody = new THREE.InstancedMesh(new THREE.CapsuleGeometry(0.17, 0.62, 4, 8), crowdBody.material, 150);
-    const standHead = new THREE.InstancedMesh(new THREE.SphereGeometry(0.115, 8, 8), crowdHead.material, 150);
+    const crowdBody = new THREE.InstancedMesh(new THREE.CapsuleGeometry(0.17, 0.5, 4, 8), new THREE.MeshStandardMaterial({ roughness: 0.95 }), CAP);
+    const crowdHead = new THREE.InstancedMesh(new THREE.SphereGeometry(0.115, 8, 8), new THREE.MeshStandardMaterial({ roughness: 0.9 }), CAP);
+    const chairMesh = new THREE.InstancedMesh(new THREE.BoxGeometry(0.46, 0.5, 0.44), new THREE.MeshStandardMaterial({ roughness: 0.8 }), CAP);
+    const standBody = new THREE.InstancedMesh(new THREE.CapsuleGeometry(0.17, 0.62, 4, 8), crowdBody.material, SCAP);
+    const standHead = new THREE.InstancedMesh(new THREE.SphereGeometry(0.115, 8, 8), crowdHead.material, SCAP);
     const dummy = new THREE.Object3D(); const col = new THREE.Color();
     const clothes = [0x1c1214, 0x241a18, 0x301f1a, 0x3a2420, 0x181016, 0x2c2024, 0xe8ded0, 0x35506e, 0x54232e];
     const skin = [0x6b4a38, 0x5c3d2c, 0x75543f, 0x4f3324];
     let ci = 0;
-    for (let row = 0; row < 12 && ci < 640; row++) {
+    for (let row = 0; row < 12 && ci < CAP; row++) {
       const r = 12.5 + row * 2.05, spread = 0.72 + row * 0.055;
       const n = Math.round(14 + r * 0.75);
-      for (let k = 0; k < n && ci < 640; k++) {
+      for (let k = 0; k < n && ci < CAP; k++) {
         const a = -spread + (k / (n - 1)) * 2 * spread;
         if (Math.abs(a) < 0.09 && row > 1) continue; // centre aisle
         const x = Math.sin(a) * r + (Math.random() - 0.5) * 0.35;
@@ -301,7 +303,7 @@ export default function Ground3D() {
     }
     [crowdBody, crowdHead, chairMesh, standBody, standHead].forEach((m, idx) => { m.count = idx < 3 ? ci : Math.min(150, Math.floor(ci * 0.28)); scene.add(m); });
     let si = 0;
-    const sc = Math.min(150, Math.floor(ci * 0.28));
+    const sc = Math.min(SCAP, Math.floor(ci * 0.28));
     for (let i = 0; i < sc; i++) {
       const side = Math.random() < 0.5 ? -1 : 1;
       const x = side * (9 + Math.random() * 14), z = -6 + Math.random() * 24;
@@ -392,7 +394,7 @@ export default function Ground3D() {
     };
     altar(-11, 3); altar(11, 3);
     /* drifting embers over the field */
-    const emN = 130, emPos = new Float32Array(emN * 3), emSeed = [];
+    const emN = MOBILE ? 70 : 130, emPos = new Float32Array(emN * 3), emSeed = [];
     for (let i = 0; i < emN; i++) { emPos[i * 3] = (Math.random() - 0.5) * 44; emPos[i * 3 + 1] = Math.random() * 8; emPos[i * 3 + 2] = (Math.random() - 0.5) * 40 - 2; emSeed.push({ s: 0.008 + Math.random() * 0.02, p: Math.random() * 6 }); }
     const emGeo = new THREE.BufferGeometry(); emGeo.setAttribute("position", new THREE.BufferAttribute(emPos, 3));
     const embers = new THREE.Points(emGeo, new THREE.PointsMaterial({ color: 0xffa04a, size: 0.09, transparent: true, opacity: 0.85, blending: THREE.AdditiveBlending, depthWrite: false }));
@@ -429,12 +431,17 @@ export default function Ground3D() {
     el.addEventListener("touchmove", touchMove, { passive: true });
     el.addEventListener("touchend", () => { pinch = 0; });
 
-    let t0 = performance.now(), lastSec = 0;
+    let t0 = performance.now(), lastSec = 0, ftAcc = 0, ftN = 0, qLevel = 0;
     const loop = (now) => {
       if (disposed) return;
       raf = requestAnimationFrame(loop);
       try {
       const dt = Math.min(0.05, (now - t0) / 1000); t0 = now;
+      if (!MOBILE ? false : (ftN++, ftAcc += dt, ftN >= 50)) {
+        const avg = ftAcc / ftN; ftAcc = 0; ftN = 0;
+        if (avg > 0.038 && qLevel === 0) { qLevel = 1; renderer.setPixelRatio(1); fixSize(); }
+        else if (avg > 0.038 && qLevel === 1) { qLevel = 2; sway.forEach((s2) => { s2.holder.visible = false; }); embers.visible = false; }
+      }
       /* flight */
       if (flight) {
         flight.k = Math.min(1, flight.k + dt * 0.9);
