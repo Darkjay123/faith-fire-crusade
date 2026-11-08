@@ -23,7 +23,7 @@ const STATIONS = {
   roads: { fb: ["12%","88%"], label: "Directions", pos: [0, 26, 10], tgt: [0, 0, -6], anchor: [-7, 0.8, 13] },
 };
 const WIDE = { pos: [0, 9.5, 31], tgt: [0, 2.5, -10] };
-const WIDE_M = { pos: [0, 5.4, 24], tgt: [0, 4.4, -7] };
+const WIDE_M = { pos: [0, 4.2, 10], tgt: [0, 4.8, -13.4] };
 const PHOTOS = [
   ["img/ground_crowd_2024.jpg", "The ground fills up — night one"],
   ["img/ground_crowd_2025.jpg", "Hands raised across the field"],
@@ -519,7 +519,8 @@ export default function Ground3D() {
     const sph = { radius: Math.hypot(camera.position.x - look.x, camera.position.y - look.y, camera.position.z - look.z), theta: Math.atan2(camera.position.x - look.x, camera.position.z - look.z), phi: Math.acos((camera.position.y - look.y) / camera.position.distanceTo(look)) };
     let flight = null;
     const flyTo = (p, t) => { flight = { p: p.slice(), t: t.slice(), k: 0 }; };
-    handle.flyTo = (k) => { const s = k ? STATIONS[k] : (MOBILE ? WIDE_M : WIDE); flyTo(s.pos, s.tgt); };
+    const setFov = (k) => { const f = k ? (MOBILE ? 46 : 58) : (MOBILE ? 32 : 58); if (camera.fov !== f) { camera.fov = f; camera.updateProjectionMatrix(); } };
+    handle.flyTo = (k) => { setFov(k); const s = k ? STATIONS[k] : (MOBILE ? WIDE_M : WIDE); flyTo(s.pos, s.tgt); };
     let dragging = false, moved = false, px = 0, py = 0, pinch = 0;
     const el = renderer.domElement;
     const onDown = (e) => { dragging = true; moved = false; px = e.clientX; py = e.clientY; flight = null; };
