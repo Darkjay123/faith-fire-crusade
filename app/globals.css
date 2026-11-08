@@ -488,3 +488,14 @@ address{font-style:normal;color:rgba(255,242,216,.85);font-size:14.5px;line-heig
  .g-world{transition:none}
  .g-hot i,.g-beam,.g-hint{animation:none}
 }
+
+/* ===== The Ground 3D ===== */
+.g3-stagebox { position: absolute; inset: 0; overflow: hidden; touch-action: none; }
+.g3-canvas { width: 100%; height: 100%; display: block; cursor: grab; }
+.g3-canvas:active { cursor: grabbing; }
+.g3-hot { position: absolute; transform: translate(-50%, -50%); display: flex; align-items: center; gap: 7px; padding: 7px 13px 7px 9px; border-radius: 999px; border: 1px solid rgba(255,183,46,.55); background: rgba(16,7,7,.72); color: #ffdf9e; font: 600 12px/1 "Segoe UI", system-ui, sans-serif; letter-spacing: .04em; backdrop-filter: blur(6px); z-index: 3; transition: background .25s, border-color .25s; }
+.g3-hot i { width: 9px; height: 9px; border-radius: 50%; background: radial-gradient(circle, #ffd98a 0%, #ff6a16 60%, rgba(255,106,22,0) 100%); box-shadow: 0 0 12px 3px rgba(255,106,22,.65); animation: g3pulse 1.6s ease-in-out infinite; flex: none; }
+.g3-hot.on { background: rgba(255,106,22,.28); border-color: #ffb72e; color: #fff2d8; }
+@keyframes g3pulse { 0%, 100% { transform: scale(1); opacity: .9; } 50% { transform: scale(1.35); opacity: 1; } }
+.g3-fail { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 14px; color: #fff2d8; z-index: 5; text-align: center; padding: 24px; }
+@media (max-width: 640px) { .g3-hot { font-size: 10px; padding: 6px 10px 6px 7px; } .g3-hot span { max-width: 64px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; } }
