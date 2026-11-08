@@ -116,7 +116,7 @@ export default function Ground3D() {
   const [hint, setHint] = useState(true);
   const [light, setLight] = useState(null);
   const [cd, setCd] = useState("--");
-  const [failed, setFailed] = useState(false);
+  const [failed, setFailed] = useState("");
   const boxRef = useRef(null);       // canvas container
   const cdRef = useRef("--");
   const hotRef = useRef({});        // hotspot buttons
@@ -168,11 +168,10 @@ export default function Ground3D() {
     if (mode !== "ground" || !boxRef.current) return;
     const box = boxRef.current;
     let renderer, raf, disposed = false;
+    try {
     const handle = { flyTo: null, drawLED: null };
     sceneRef.current = handle;
-    try {
       renderer = new THREE.WebGLRenderer({ antialias: true, powerPreference: "high-performance" });
-    } catch (e) { setFailed(true); return; }
     renderer.setPixelRatio(Math.min(devicePixelRatio || 1, 1.6));
     renderer.setSize(box.clientWidth, box.clientHeight);
     renderer.toneMapping = THREE.ACESFilmicToneMapping;
@@ -198,13 +197,13 @@ export default function Ground3D() {
     }
 
     /* lights */
-    scene.add(new THREE.HemisphereLight(0x2a2136, 0x140d08, 0.6));
-    scene.add(new THREE.AmbientLight(0xffffff, 0.10));
-    const stageWash1 = new THREE.SpotLight(0xff4fd8, 140, 60, 0.55, 0.6); stageWash1.position.set(-4.5, 6.8, -15); stageWash1.target.position.set(0, 2.2, -12); scene.add(stageWash1, stageWash1.target);
-    const stageWash2 = new THREE.SpotLight(0x4f7dff, 120, 60, 0.55, 0.6); stageWash2.position.set(4.5, 6.8, -15); stageWash2.target.position.set(0, 2.2, -12); scene.add(stageWash2, stageWash2.target);
-    const crowdWashL = new THREE.SpotLight(0xfff2d8, 300, 90, 0.5, 0.7); crowdWashL.position.set(-13, 9, 6); crowdWashL.target.position.set(-2, 0, 2); scene.add(crowdWashL, crowdWashL.target);
-    const crowdWashR = new THREE.SpotLight(0xfff2d8, 300, 90, 0.5, 0.7); crowdWashR.position.set(13, 9, 6); crowdWashR.target.position.set(2, 0, 2); scene.add(crowdWashR, crowdWashR.target);
-    const moon = new THREE.DirectionalLight(0x8090b8, 0.35); moon.position.set(-30, 40, 20); scene.add(moon);
+    scene.add(new THREE.HemisphereLight(0x2a2136, 0x140d08, 1.1));
+    scene.add(new THREE.AmbientLight(0xffffff, 0.22));
+    const stageWash1 = new THREE.SpotLight(0xff4fd8, 400, 60, 0.55, 0.6); stageWash1.position.set(-4.5, 6.8, -15); stageWash1.target.position.set(0, 2.2, -12); scene.add(stageWash1, stageWash1.target);
+    const stageWash2 = new THREE.SpotLight(0x4f7dff, 350, 60, 0.55, 0.6); stageWash2.position.set(4.5, 6.8, -15); stageWash2.target.position.set(0, 2.2, -12); scene.add(stageWash2, stageWash2.target);
+    const crowdWashL = new THREE.SpotLight(0xfff2d8, 1600, 90, 0.5, 0.7); crowdWashL.position.set(-13, 9, 6); crowdWashL.target.position.set(-2, 0, 2); scene.add(crowdWashL, crowdWashL.target);
+    const crowdWashR = new THREE.SpotLight(0xfff2d8, 1600, 90, 0.5, 0.7); crowdWashR.position.set(13, 9, 6); crowdWashR.target.position.set(2, 0, 2); scene.add(crowdWashR, crowdWashR.target);
+    const moon = new THREE.DirectionalLight(0x8090b8, 0.6); moon.position.set(-30, 40, 20); scene.add(moon);
 
     /* materials */
     const M = {
@@ -326,7 +325,7 @@ export default function Ground3D() {
       add(g, new THREE.BoxGeometry(1.7, 0.35, 0.35), M.truss, 0, 9.1, 0);
       const heads = [-0.6, 0.6].map((o) => add(g, new THREE.BoxGeometry(0.5, 0.3, 0.4), M.black, o, 8.95, 0.1));
       g.position.set(x, 0, z); g.lookAt(tx, 0, tz); g.rotation.x = 0; g.rotation.z = 0;
-      const spot = new THREE.SpotLight(0xfff2d8, 500, 110, 0.42, 0.55); spot.position.set(x, 9, z); spot.target.position.set(tx, 0, tz); scene.add(spot, spot.target);
+      const spot = new THREE.SpotLight(0xfff2d8, 2500, 110, 0.42, 0.55); spot.position.set(x, 9, z); spot.target.position.set(tx, 0, tz); scene.add(spot, spot.target);
       const beam = new THREE.Mesh(new THREE.ConeGeometry(5.5, 15, 20, 1, true), new THREE.MeshBasicMaterial({ color: 0xffe9c0, transparent: true, opacity: 0.055, side: THREE.DoubleSide, blending: THREE.AdditiveBlending, depthWrite: false }));
       beam.position.set(x, 9, z);
       const dir = new THREE.Vector3(tx - x, -9, tz - z).normalize();
@@ -386,7 +385,7 @@ export default function Ground3D() {
       const g = new THREE.Group();
       for (let i = 0; i < 7; i++) { const a = (i / 7) * Math.PI * 2; add(g, new THREE.BoxGeometry(0.28, 0.2, 0.22), new THREE.MeshStandardMaterial({ color: 0x55504a, roughness: 1 }), Math.cos(a) * 0.5, 0.1, Math.sin(a) * 0.5); }
       const f = add(g, new THREE.ConeGeometry(0.22, 0.7, 8), new THREE.MeshBasicMaterial({ color: 0xff8a1e, transparent: true, opacity: 0.9 }), 0, 0.5, 0);
-      const fl = new THREE.PointLight(0xff7a1e, 14, 12, 2); fl.position.set(0, 1, 0); g.add(fl);
+      const fl = new THREE.PointLight(0xff7a1e, 40, 14, 2); fl.position.set(0, 1, 0); g.add(fl);
       g.position.set(x, 0, z); scene.add(g); flames.push(f); fireLights.push(fl);
     };
     altar(-11, 3); altar(11, 3);
@@ -432,6 +431,7 @@ export default function Ground3D() {
     const loop = (now) => {
       if (disposed) return;
       raf = requestAnimationFrame(loop);
+      try {
       const dt = Math.min(0.05, (now - t0) / 1000); t0 = now;
       /* flight */
       if (flight) {
@@ -452,7 +452,7 @@ export default function Ground3D() {
       const t = now / 1000;
       sway.forEach((s) => { s.holder.quaternion.copy(s.base); s.holder.rotateZ(Math.sin(t * 0.5 + s.phase) * s.amp); });
       flames.forEach((f, i) => { const k = 1 + Math.sin(t * 9 + i * 2.4) * 0.16 + Math.sin(t * 23 + i) * 0.07; f.scale.set(k, 1 + (k - 1) * 1.6, k); });
-      fireLights.forEach((l, i) => { l.intensity = 12 + Math.sin(t * 11 + i * 3) * 3; });
+      fireLights.forEach((l, i) => { l.intensity = 34 + Math.sin(t * 11 + i * 3) * 8; });
       const pos = emGeo.attributes.position.array;
       for (let i = 0; i < emN; i++) { pos[i * 3 + 1] += emSeed[i].s; pos[i * 3] += Math.sin(t + emSeed[i].p) * 0.004; if (pos[i * 3 + 1] > 9) { pos[i * 3 + 1] = 0.1; } }
       emGeo.attributes.position.needsUpdate = true;
@@ -469,6 +469,10 @@ export default function Ground3D() {
         btn.style.top = `${(-hv.y * 0.5 + 0.5) * 100}%`;
       }
       renderer.render(scene, camera);
+      } catch (err) {
+        disposed = true; cancelAnimationFrame(raf);
+        setFailed("3D frame error: " + (err && err.message ? err.message : String(err)));
+      }
     };
     raf = requestAnimationFrame(loop);
 
@@ -489,6 +493,10 @@ export default function Ground3D() {
       if (el.parentNode) el.parentNode.removeChild(el);
       scene.traverse((o) => { if (o.geometry) o.geometry.dispose(); if (o.material) { (Array.isArray(o.material) ? o.material : [o.material]).forEach((mm) => { if (mm.map) mm.map.dispose(); mm.dispose(); }); } });
     };
+    } catch (err) {
+      setFailed("3D build error: " + (err && err.message ? err.message : String(err)));
+      return () => {};
+    }
     /* eslint-disable-next-line */
   }, [mode]);
 
@@ -516,7 +524,7 @@ export default function Ground3D() {
     <div className={`ground ${station ? "focused" : ""}`} role="region" aria-label="Interactive crusade ground in 3D">
       <div ref={boxRef} className="g3-stagebox" />
       {failed ? (
-        <div className="g3-fail">Your browser could not open the 3D ground. <button className="g-hbtn gold" onClick={() => toSite("site")}>Open the simple view</button></div>
+        <div className="g3-fail"><span>{failed}</span>Your browser could not open the 3D ground. <button className="g-hbtn gold" onClick={() => toSite("site")}>Open the simple view</button></div>
       ) : null}
       {/* hotspots projected onto the world */}
       {Object.keys(STATIONS).map((k) => (
