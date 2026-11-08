@@ -8,12 +8,12 @@ import { SITE } from "../lib/config";
    to fly to a place, panels carry the details. #site returns to the scroll site. */
 
 const STATIONS = {
-  stage: { label: "The Stage", pos: [0, 3.6, -2.5], tgt: [0, 3.0, -14.5], anchor: [0, 4.4, -13] },
-  screen: { label: "Programme", pos: [4.2, 4.0, -5.5], tgt: [5.4, 3.8, -14.5], anchor: [5.4, 5.2, -14.6] },
-  gate: { label: "The Gate", pos: [2.5, 4.5, 27.5], tgt: [0, 2.2, 21], anchor: [0, 3.4, 21] },
-  fire: { label: "Fire Altars", pos: [-8.0, 3.4, 9.0], tgt: [-11, 1.2, 3], anchor: [-11, 2.4, 3] },
-  gallery: { label: "Moments", pos: [10, 3.2, 11], tgt: [0, 1.6, 0], anchor: [10, 2.6, 9] },
-  roads: { label: "Directions", pos: [0, 26, 10], tgt: [0, 0, -6], anchor: [-7, 0.8, 13] },
+  stage: { fb: ["57%","43%"], label: "The Stage", pos: [0, 3.6, -2.5], tgt: [0, 3.0, -14.5], anchor: [0, 4.4, -13] },
+  screen: { fb: ["33%","24%"], label: "Programme", pos: [4.2, 4.0, -5.5], tgt: [5.4, 3.8, -14.5], anchor: [5.4, 5.2, -14.6] },
+  gate: { fb: ["55%","88%"], label: "The Gate", pos: [2.5, 4.5, 27.5], tgt: [0, 2.2, 21], anchor: [0, 3.4, 21] },
+  fire: { fb: ["30%","78%"], label: "Fire Altars", pos: [-8.0, 3.4, 9.0], tgt: [-11, 1.2, 3], anchor: [-11, 2.4, 3] },
+  gallery: { fb: ["82%","60%"], label: "Moments", pos: [10, 3.2, 11], tgt: [0, 1.6, 0], anchor: [10, 2.6, 9] },
+  roads: { fb: ["12%","88%"], label: "Directions", pos: [0, 26, 10], tgt: [0, 0, -6], anchor: [-7, 0.8, 13] },
 };
 const WIDE = { pos: [0, 9.5, 31], tgt: [0, 2.5, -10] };
 const PHOTOS = [
@@ -171,6 +171,11 @@ export default function Ground3D() {
     try {
     const handle = { flyTo: null, drawLED: null };
     sceneRef.current = handle;
+    let frames = 0, dbgMsg = "starting";
+    const dbg = () => { const d = document.getElementById("g3dbg"); if (d) d.textContent = dbgMsg; };
+    const onErr = (e) => { dbgMsg = "WINERR " + (e.message || e.type); dbg(); };
+    addEventListener("error", onErr);
+    dbg();
       renderer = new THREE.WebGLRenderer({ antialias: true, powerPreference: "high-performance" });
     renderer.setPixelRatio(Math.min(devicePixelRatio || 1, 1.6));
     renderer.setSize(box.clientWidth, box.clientHeight);
@@ -178,7 +183,9 @@ export default function Ground3D() {
     renderer.toneMappingExposure = 1.15;
     renderer.outputColorSpace = THREE.SRGBColorSpace;
     box.appendChild(renderer.domElement);
+    renderer.setClearColor(0x0a0608);
     renderer.domElement.className = "g3-canvas";
+    dbgMsg = "ctx " + box.clientWidth + "x" + box.clientHeight; dbg();
 
     const scene = new THREE.Scene();
     scene.background = new THREE.Color(0x050308);
@@ -189,8 +196,8 @@ export default function Ground3D() {
     {
       const n = 420, pos = new Float32Array(n * 3);
       for (let i = 0; i < n; i++) {
-        const th = Math.random() * Math.PI * 2, ph = Math.random() * 0.5 + 0.05, r = 130;
-        pos[i * 3] = r * Math.sin(ph) * Math.cos(th); pos[i * 3 + 1] = r * Math.cos(ph) * 0.9 + 12; pos[i * 3 + 2] = r * Math.sin(ph) * Math.sin(th);
+        const th = Math.random() * Math.PI * 2;
+        pos[i * 3] = (Math.random() - 0.5) * 240; pos[i * 3 + 1] = 14 + Math.random() * 110; pos[i * 3 + 2] = (Math.random() - 0.5) * 240;
       }
       const g = new THREE.BufferGeometry(); g.setAttribute("position", new THREE.BufferAttribute(pos, 3));
       scene.add(new THREE.Points(g, new THREE.PointsMaterial({ color: 0x9fb4d8, size: 0.55, sizeAttenuation: false, transparent: true, opacity: 0.75 })));
@@ -432,6 +439,8 @@ export default function Ground3D() {
       if (disposed) return;
       raf = requestAnimationFrame(loop);
       try {
+      frames++;
+      if (frames % 30 === 1) { dbgMsg = "ok f=" + frames + " cam=" + camera.position.x.toFixed(1) + "," + camera.position.y.toFixed(1) + "," + camera.position.z.toFixed(1); dbg(); }
       const dt = Math.min(0.05, (now - t0) / 1000); t0 = now;
       /* flight */
       if (flight) {
@@ -471,7 +480,7 @@ export default function Ground3D() {
       renderer.render(scene, camera);
       } catch (err) {
         disposed = true; cancelAnimationFrame(raf);
-        setFailed("3D frame error: " + (err && err.message ? err.message : String(err)));
+        dbgMsg = "FRAMEERR " + (err && err.message ? err.message : String(err)); dbg(); setFailed(dbgMsg);
       }
     };
     raf = requestAnimationFrame(loop);
@@ -487,14 +496,14 @@ export default function Ground3D() {
 
     return () => {
       disposed = true; cancelAnimationFrame(raf);
-      removeEventListener("resize", onResize); removeEventListener("pointermove", onMove); removeEventListener("pointerup", onUp);
+      removeEventListener("resize", onResize); removeEventListener("pointermove", onMove); removeEventListener("pointerup", onUp); removeEventListener("error", onErr);
       el.removeEventListener("pointerdown", onDown); el.removeEventListener("wheel", onWheel); el.removeEventListener("touchmove", touchMove);
       renderer.dispose();
       if (el.parentNode) el.parentNode.removeChild(el);
       scene.traverse((o) => { if (o.geometry) o.geometry.dispose(); if (o.material) { (Array.isArray(o.material) ? o.material : [o.material]).forEach((mm) => { if (mm.map) mm.map.dispose(); mm.dispose(); }); } });
     };
     } catch (err) {
-      setFailed("3D build error: " + (err && err.message ? err.message : String(err)));
+      dbgMsg = "BUILDERR " + (err && err.message ? err.message : String(err)); dbg(); setFailed(dbgMsg);
       return () => {};
     }
     /* eslint-disable-next-line */
@@ -523,12 +532,13 @@ export default function Ground3D() {
   return (
     <div className={`ground ${station ? "focused" : ""}`} role="region" aria-label="Interactive crusade ground in 3D">
       <div ref={boxRef} className="g3-stagebox" />
+      <div id="g3dbg" className="g3-dbg" />
       {failed ? (
         <div className="g3-fail"><span>{failed}</span>Your browser could not open the 3D ground. <button className="g-hbtn gold" onClick={() => toSite("site")}>Open the simple view</button></div>
       ) : null}
       {/* hotspots projected onto the world */}
       {Object.keys(STATIONS).map((k) => (
-        <button key={k} ref={(r) => { hotRef.current[k] = r; }} className={`g3-hot ${station === k ? "on" : ""}`} onClick={() => go(station === k ? null : k)} aria-label={STATIONS[k].label}>
+        <button key={k} ref={(r) => { hotRef.current[k] = r; }} className={`g3-hot ${station === k ? "on" : ""}`} onClick={() => go(station === k ? null : k)} aria-label={STATIONS[k].label} style={{ left: STATIONS[k].fb[0], top: STATIONS[k].fb[1] }}>
           <i /><span>{STATIONS[k].label}</span>
         </button>
       ))}
