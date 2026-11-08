@@ -440,7 +440,7 @@ export default function Ground3D() {
       raf = requestAnimationFrame(loop);
       try {
       frames++;
-      if (frames % 30 === 1) { dbgMsg = "ok f=" + frames + " cam=" + camera.position.x.toFixed(1) + "," + camera.position.y.toFixed(1) + "," + camera.position.z.toFixed(1); dbg(); }
+      if (frames % 5 === 1) { dbgMsg = "f=" + frames + " cam=" + camera.position.x.toFixed(2) + "," + camera.position.y.toFixed(2) + "," + camera.position.z.toFixed(2) + " look=" + look.x.toFixed(1) + "," + look.y.toFixed(1) + "," + look.z.toFixed(1) + " vp=" + box.clientWidth + "x" + box.clientHeight + " buf=" + renderer.domElement.width + "x" + renderer.domElement.height + " asp=" + camera.aspect.toFixed(3) + " dc=" + renderer.info.render.calls; dbg(); }
       const dt = Math.min(0.05, (now - t0) / 1000); t0 = now;
       /* flight */
       if (flight) {
@@ -488,15 +488,21 @@ export default function Ground3D() {
     /* LED refresh bridge */
     handle.drawLED = () => { drawLED(led.c, cdRef.current); led.t.needsUpdate = true; };
 
-    const onResize = () => {
-      camera.aspect = box.clientWidth / box.clientHeight; camera.updateProjectionMatrix();
-      renderer.setSize(box.clientWidth, box.clientHeight);
+    const fixSize = () => {
+      const w = box.clientWidth || innerWidth, h = box.clientHeight || innerHeight;
+      if (renderer.domElement.width !== Math.round(w * renderer.getPixelRatio()) || renderer.domElement.height !== Math.round(h * renderer.getPixelRatio())) renderer.setSize(w, h);
+      const a = w / h;
+      if (isFinite(a) && Math.abs(camera.aspect - a) > 0.001) { camera.aspect = a; camera.updateProjectionMatrix(); }
     };
+    const onResize = () => fixSize();
+    fixSize();
     addEventListener("resize", onResize);
+    const ro = typeof ResizeObserver !== "undefined" ? new ResizeObserver(fixSize) : null;
+    if (ro) ro.observe(box);
 
     return () => {
       disposed = true; cancelAnimationFrame(raf);
-      removeEventListener("resize", onResize); removeEventListener("pointermove", onMove); removeEventListener("pointerup", onUp); removeEventListener("error", onErr);
+      removeEventListener("resize", onResize); removeEventListener("pointermove", onMove); removeEventListener("pointerup", onUp); removeEventListener("error", onErr); if (ro) ro.disconnect();
       el.removeEventListener("pointerdown", onDown); el.removeEventListener("wheel", onWheel); el.removeEventListener("touchmove", touchMove);
       renderer.dispose();
       if (el.parentNode) el.parentNode.removeChild(el);
