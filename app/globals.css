@@ -505,3 +505,16 @@ address{font-style:normal;color:rgba(255,242,216,.85);font-size:14.5px;line-heig
   .g-chips button { padding: 6px 9px; font-size: 10px; }
   .g-panel { width: min(92vw, 420px); max-height: 72vh; overflow-y: auto; }
 }
+
+/* the guided walkthrough */
+.g-tour{position:fixed;left:50%;transform:translateX(-50%);bottom:96px;z-index:60;width:min(500px,calc(100vw - 28px));border:1px solid rgba(255,178,46,.35);border-radius:16px;padding:16px 20px 42px;background:linear-gradient(180deg,rgba(16,7,5,.92),rgba(10,4,3,.96));backdrop-filter:blur(10px);box-shadow:0 18px 50px rgba(0,0,0,.55);animation:gslide .5s cubic-bezier(.22,.61,.36,1)}
+.g-tour strong{display:block;font-family:var(--disp);font-size:24px;letter-spacing:.06em;color:#FFF2D8;margin:2px 0 8px}
+.g-tour p{margin:0 0 12px;font-size:13.5px;line-height:1.6;color:rgba(255,242,216,.8)}
+.g-tour .g-cta{margin-bottom:6px}
+.g-tour-kick{font-size:10px;letter-spacing:.26em;text-transform:uppercase;color:#FFB72E}
+.g-tour-dots{position:absolute;left:20px;bottom:16px;display:flex;gap:6px}
+.g-tour-dots i{width:7px;height:7px;border-radius:50%;background:rgba(255,242,216,.25);display:block}
+.g-tour-dots i.on{background:#FF6A16}
+.g-tour-end{position:absolute;right:16px;bottom:12px;background:none;border:0;color:rgba(255,242,216,.65);font-size:11px;letter-spacing:.18em;text-transform:uppercase;cursor:pointer}
+.g-tour-end:hover{color:#FFB72E}
+@media (max-width:700px){.g-tour{bottom:118px;padding:14px 16px 40px}.g-tour strong{font-size:20px}}

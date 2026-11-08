@@ -35,6 +35,17 @@ const PHOTOS = [
 ];
 const SITE_SECTIONS = ["register", "testimony", "gallery", "nights", "invite", "live", "venue", "prayer", "top"];
 
+/* the guided walkthrough: camera stops at each place with a caption card */
+const TOUR = [
+  { k: "gate", title: "The Gate", cap: "This is how the ground receives you. Come early: the field fills from the gate." },
+  { k: "stage", title: "The Stage", cap: "The Word goes out here. Three nights, 4:30 PM daily, free entry." },
+  { k: "screen", title: "Programme", cap: "Opening Night, The Fire Altars, Commissioning. Watch the countdown tick." },
+  { k: "fire", title: "Fire Altars", cap: "Altars of prayer burn through the night. Bring a burden, leave with a testimony." },
+  { k: "gallery", title: "Moments", cap: "Years of the crusade on one wall: the crowd, the worship, the Word." },
+  { k: "roads", title: "Directions", cap: "Crusade Ground, opposite Gospel Stars Church, off Olori 19 Road, behind Ese-G Hostel, Abraka." },
+];
+const TOUR_END = { title: "See you on the ground", cap: "Dec 6 to 8, 4:30 PM daily, free entry. Register now so your seat is waiting." };
+
 function msToNext() {
   const now = Date.now();
   let next = null;
@@ -121,6 +132,8 @@ export default function Ground3D() {
   const [station, setStation] = useState(null);
   const [mode, setMode] = useState("ground");
   const [sound, setSound] = useState(false);
+  const [tour, setTour] = useState(-1); // -1 off, 0..TOUR.length walking
+  const songRef = useRef(null);
   const [hint, setHint] = useState(true);
   const [light, setLight] = useState(null);
   const [cd, setCd] = useState("--");
@@ -153,7 +166,7 @@ export default function Ground3D() {
 
   /* fire ambience (Web Audio, on demand) */
   useEffect(() => {
-    if (!sound) { if (ambRef.current) { try { ambRef.current.ctx.close(); } catch (e) {} ambRef.current = null; } return; }
+    if (!sound) { if (ambRef.current) { try { ambRef.current.ctx.close(); } catch (e) {} ambRef.current = null; } if (songRef.current) { try { songRef.current.pause(); } catch (e) {} } return; }
     try {
       const AC = window.AudioContext || window.webkitAudioContext;
       const ctx = new AC(); const len = ctx.sampleRate * 2, buf = ctx.createBuffer(1, len, ctx.sampleRate), d = buf.getChannelData(0);
@@ -167,8 +180,14 @@ export default function Ground3D() {
       lfo.connect(lg); lg.connect(g.gain); lfo.start();
       src.connect(f); f.connect(g); g.connect(ctx.destination); src.start();
       ambRef.current = { ctx };
+      try {
+        const a = songRef.current || new Audio("audio/same-sound.mp3");
+        a.loop = false; a.volume = 0.9;
+        a.play().catch(() => {});
+        songRef.current = a;
+      } catch (e2) {}
     } catch (e) { setSound(false); }
-    return () => { if (ambRef.current) { try { ambRef.current.ctx.close(); } catch (e) {} ambRef.current = null; } };
+    return () => { if (ambRef.current) { try { ambRef.current.ctx.close(); } catch (e) {} ambRef.current = null; } if (songRef.current) { try { songRef.current.pause(); } catch (e) {} } };
   }, [sound]);
 
   /* the 3D world */
@@ -683,7 +702,22 @@ export default function Ground3D() {
     sceneRef.current && sceneRef.current.flyTo && sceneRef.current.flyTo(station);
   }, [station, mode]);
 
-  const go = (k) => {
+  /* the walkthrough: walk each stop, then the wide view with the closing card */
+  useEffect(() => {
+    if (mode !== "ground" || tour < 0) return;
+    if (tour === TOUR.length) {
+      go(null, true);
+      const t = setTimeout(() => setTour(-1), 9000);
+      return () => clearTimeout(t);
+    }
+    const stop = TOUR[tour];
+    if (stop) go(stop.k, true);
+    const t = setTimeout(() => setTour(tour + 1), 12000);
+    return () => clearTimeout(t);
+  }, [tour, mode]);
+
+  const go = (k, fromTour) => {
+    if (!fromTour && tour >= 0) setTour(-1);
     history.replaceState(null, "", k ? `#g${k}` : "#ground");
     setStation(k);
     if (k && navigator.vibrate) { try { navigator.vibrate(8); } catch (e) {} }
@@ -713,7 +747,8 @@ export default function Ground3D() {
         <span className="g-brand"><i className="g-flame" />FAITH &amp; FIRE <em>&rsquo;26</em></span>
         <nav className="g-hnav" aria-label="Ground navigation">
           <button className="g-hbtn" onClick={() => setSound(!sound)} aria-pressed={sound}>{sound ? "Sound on" : "Sound"}</button>
-          <button className="g-hbtn gold" onClick={() => toSite("site")}>Simple view</button>
+          <button className="g-hbtn gold" onClick={() => { if (sound) setSound(false); setTour(0); }}>Take the walk</button>
+          <button className="g-hbtn" onClick={() => toSite("site")}>Simple view</button>
         </nav>
       </header>
       {hint && !station ? <div className="g-hint">Drag to walk the ground &middot; pinch to zoom &middot; tap a flame to enter a place</div> : null}
@@ -726,6 +761,26 @@ export default function Ground3D() {
         <button className={station === "gallery" ? "on" : ""} onClick={() => go("gallery")}>Moments</button>
         <button className={station === "roads" ? "on" : ""} onClick={() => go("roads")}>Directions</button>
       </nav>
+      {tour >= 0 ? (
+        <aside className={`g-tour ${tour === TOUR.length ? "end" : ""}`} role="dialog" aria-label="The walkthrough">
+          {tour < TOUR.length ? (
+            <>
+              <span className="g-tour-kick">The walk &middot; {tour + 1} of {TOUR.length}</span>
+              <strong>{TOUR[tour].title}</strong>
+              <p>{TOUR[tour].cap}</p>
+            </>
+          ) : (
+            <>
+              <span className="g-tour-kick">The walk &middot; done</span>
+              <strong>{TOUR_END.title}</strong>
+              <p>{TOUR_END.cap}</p>
+              <button className="g-cta" onClick={() => { setTour(-1); toSite("register"); }}>Register &nearr;</button>
+            </>
+          )}
+          <div className="g-tour-dots">{Array.from({ length: TOUR.length }).map((_, i) => <i key={i} className={i === tour ? "on" : ""} />)}</div>
+          <button className="g-tour-end" onClick={() => { setTour(-1); go(null, true); }}>End walk</button>
+        </aside>
+      ) : null}
       {st ? (
         <aside className="g-panel" role="dialog" aria-label={st.label}>
           <button className="g-close" onClick={() => go(null)} aria-label="Back to the whole ground">&larr; Whole ground</button>
