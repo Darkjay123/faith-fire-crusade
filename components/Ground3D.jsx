@@ -164,7 +164,16 @@ export default function Ground3D() {
   /* test hook: ?tour=1 auto-starts the walkthrough */
   useEffect(() => {
     if (mode !== "ground") return;
-    if (typeof URLSearchParams !== "undefined" && new URLSearchParams(location.search).get("tour") === "1") { setSound(false); setTour(0); }
+    if (typeof URLSearchParams === "undefined") return;
+    const q = new URLSearchParams(location.search);
+    if (q.get("tour") === "1") { setSound(false); setTour(0); return; }
+    let seen = false;
+    try { seen = !!localStorage.getItem("ff_toured"); } catch (e) {}
+    if (!seen && !location.hash) {
+      try { localStorage.setItem("ff_toured", "1"); } catch (e) {}
+      const t = setTimeout(() => setTour(0), 4000);
+      return () => clearTimeout(t);
+    }
   }, [mode]);
   useEffect(() => { if (mode !== "ground") return; const t = setInterval(() => setCd(msToNext() || "LIVE"), 1000); setCd(msToNext() || "LIVE"); return () => clearInterval(t); }, [mode]);
   useEffect(() => { cdRef.current = cd; }, [cd]);
@@ -642,10 +651,12 @@ export default function Ground3D() {
         const btn = hotRef.current[k]; if (!btn) continue;
         const a = STATIONS[k].anchor;
         hv.set(a[0], a[1], a[2]).project(camera);
-        if (hv.z > 1) { btn.style.display = "none"; continue; }
-        btn.style.display = "";
-        btn.style.left = `${(hv.x * 0.5 + 0.5) * 100}%`;
-        btn.style.top = `${(-hv.y * 0.5 + 0.5) * 100}%`;
+        if (hv.z > 1) { if (btn.style.display !== "none") btn.style.display = "none"; continue; }
+        if (btn.style.display === "none") btn.style.display = "";
+        const lx = `${((hv.x * 0.5 + 0.5) * 100).toFixed(2)}%`;
+        const ly = `${((-hv.y * 0.5 + 0.5) * 100).toFixed(2)}%`;
+        if (btn.dataset.lx !== lx) { btn.dataset.lx = lx; btn.style.left = lx; }
+        if (btn.dataset.ly !== ly) { btn.dataset.ly = ly; btn.style.top = ly; }
       }
       if (composer) composer.render(); else renderer.render(scene, camera);
       } catch (err) {
@@ -680,14 +691,15 @@ export default function Ground3D() {
       if (composer) composer.setSize(w, h);
       if (isFinite(a) && Math.abs(camera.aspect - a) > 0.001) { camera.aspect = a; camera.updateProjectionMatrix(); }
     };
-    const onResize = () => fixSize();
+    let rsT = 0;
+    const onResize = () => { clearTimeout(rsT); rsT = setTimeout(fixSize, 120); };
     fixSize();
     addEventListener("resize", onResize);
-    const ro = typeof ResizeObserver !== "undefined" ? new ResizeObserver(fixSize) : null;
+    const ro = typeof ResizeObserver !== "undefined" ? new ResizeObserver(() => { clearTimeout(rsT); rsT = setTimeout(fixSize, 120); }) : null;
     if (ro) ro.observe(box);
 
     return () => {
-      disposed = true; cancelAnimationFrame(raf);
+      disposed = true; cancelAnimationFrame(raf); clearTimeout(rsT);
       removeEventListener("resize", onResize); removeEventListener("pointermove", onMove); removeEventListener("pointerup", onUp); if (ro) ro.disconnect();
       el.removeEventListener("pointerdown", onDown); el.removeEventListener("wheel", onWheel); el.removeEventListener("touchmove", touchMove);
       renderer.dispose();
@@ -773,6 +785,7 @@ export default function Ground3D() {
               <span className="g-tour-kick">The walk &middot; {tour + 1} of {TOUR.length}</span>
               <strong>{TOUR[tour].title}</strong>
               <p>{TOUR[tour].cap}</p>
+              {tour === 0 && !sound ? <span className="g-tour-hint">Tap Sound up top to hear the pastor&rsquo;s voice as you walk</span> : null}
             </>
           ) : (
             <>

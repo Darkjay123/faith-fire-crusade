@@ -518,3 +518,15 @@ address{font-style:normal;color:rgba(255,242,216,.85);font-size:14.5px;line-heig
 .g-tour-end{position:absolute;right:16px;bottom:12px;background:none;border:0;color:rgba(255,242,216,.65);font-size:11px;letter-spacing:.18em;text-transform:uppercase;cursor:pointer}
 .g-tour-end:hover{color:#FFB72E}
 @media (max-width:700px){.g-tour{bottom:118px;padding:14px 16px 40px}.g-tour strong{font-size:20px}}
+
+/* ground stability + mobile polish */
+.g3-stagebox { background: #0a0403; }
+.g3-canvas { transform: translateZ(0); backface-visibility: hidden; }
+.g-tour-hint { display: block; font-size: 11px; color: #FFB72E; letter-spacing: .04em; margin: -6px 0 10px; }
+@media (max-width: 820px) {
+  .g-hbtn { padding: 7px 10px; font-size: 10px; letter-spacing: .08em; }
+  .g-brand { font-size: 11px; letter-spacing: .14em; }
+  .g-tour { bottom: calc(78px + env(safe-area-inset-bottom)); padding: 13px 14px 38px; }
+  .g-tour strong { font-size: 19px; }
+  .g-tour p { font-size: 12.5px; }
+}
