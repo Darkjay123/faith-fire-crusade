@@ -653,8 +653,8 @@ export default function Ground3D() {
         hv.set(a[0], a[1], a[2]).project(camera);
         if (hv.z > 1) { if (btn.style.display !== "none") btn.style.display = "none"; continue; }
         if (btn.style.display === "none") btn.style.display = "";
-        const lx = `${((hv.x * 0.5 + 0.5) * 100).toFixed(2)}%`;
-        const ly = `${((-hv.y * 0.5 + 0.5) * 100).toFixed(2)}%`;
+        const lx = `${Math.min(96, Math.max(4, (hv.x * 0.5 + 0.5) * 100)).toFixed(2)}%`;
+        const ly = `${Math.min(90, Math.max(8, (-hv.y * 0.5 + 0.5) * 100)).toFixed(2)}%`;
         if (btn.dataset.lx !== lx) { btn.dataset.lx = lx; btn.style.left = lx; }
         if (btn.dataset.ly !== ly) { btn.dataset.ly = ly; btn.style.top = ly; }
       }
@@ -749,7 +749,7 @@ export default function Ground3D() {
   const st = station ? STATIONS[station] : null;
 
   return (
-    <div className={`ground ${station ? "focused" : ""}`} role="region" aria-label="Interactive crusade ground in 3D">
+    <div className={`ground ${station ? "focused" : ""} ${tour >= 0 ? "touring" : ""}`} role="region" aria-label="Interactive crusade ground in 3D">
       <div ref={boxRef} className="g3-stagebox" />
       {failed ? (
         <div className="g3-fail"><span>{failed}</span>Your browser could not open the 3D ground. <button className="g-hbtn gold" onClick={() => toSite("site")}>Open the simple view</button></div>
