@@ -553,3 +553,11 @@ address{font-style:normal;color:rgba(255,242,216,.85);font-size:14.5px;line-heig
 /* real assets pass */
 .h1img{line-height:0}
 .hmark{width:min(640px,88vw);height:auto;display:block;margin:2px auto 10px;filter:drop-shadow(0 12px 44px rgba(255,106,22,.38))}
+
+/* tour nav + pioneer cutout */
+.g-tour-nav{display:flex;gap:8px;margin-top:12px}
+.g-tour-nav button{flex:1;cursor:pointer;padding:10px 14px;border-radius:10px;border:1px solid rgba(255,183,46,.4);background:rgba(255,183,46,.08);color:#FFF2D8;text-transform:uppercase;letter-spacing:.14em;font-size:10px}
+.g-tour-nav button.gold{background:linear-gradient(90deg,#FF6A16,#FFB72E);color:#100707;border-color:transparent}
+.g-tour-nav button:disabled{opacity:.35;cursor:default}
+.q-pastor{position:absolute;bottom:0;left:50%;transform:translateX(-50%);height:82%;max-height:520px;width:auto;opacity:.92;pointer-events:none;z-index:0;filter:drop-shadow(0 0 40px rgba(255,106,22,.25))}
+.quote .qin{position:relative;z-index:1}

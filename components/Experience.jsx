@@ -394,6 +394,7 @@ export default function Experience() {
 
       <div className="quote" style={{ minHeight: "60vh" }}>
         <div className="bg" style={{ backgroundImage: "url(img/crowd_glow.jpg)" }} />
+        <img className="q-pastor" src="img/pastor_cutout.webp" alt="" />
         <div className="qin reveal">
           <p className="eyebrow">Counting down to the fire</p>
           <div id="cd2" className="cdown" style={{ marginTop: 30 }} />

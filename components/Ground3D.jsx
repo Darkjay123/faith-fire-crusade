@@ -786,6 +786,10 @@ export default function Ground3D() {
               <strong>{TOUR[tour].title}</strong>
               <p>{TOUR[tour].cap}</p>
               {tour === 0 && !sound ? <span className="g-tour-hint">Tap Sound up top to hear the pastor&rsquo;s voice as you walk</span> : null}
+              <div className="g-tour-nav">
+                <button onClick={() => setTour(Math.max(0, tour - 1))} disabled={tour === 0}>Back</button>
+                <button className="gold" onClick={() => setTour(tour + 1)}>{tour === TOUR.length - 1 ? "Finish" : "Next"}</button>
+              </div>
             </>
           ) : (
             <>
