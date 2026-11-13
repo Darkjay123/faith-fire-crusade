@@ -561,3 +561,7 @@ address{font-style:normal;color:rgba(255,242,216,.85);font-size:14.5px;line-heig
 .g-tour-nav button:disabled{opacity:.35;cursor:default}
 .q-pastor{position:absolute;bottom:0;left:50%;transform:translateX(-50%);height:82%;max-height:520px;width:auto;opacity:.92;pointer-events:none;z-index:0;filter:drop-shadow(0 0 40px rgba(255,106,22,.25))}
 .quote .qin{position:relative;z-index:1}
+
+/* pastor cutout polish: melt into the section, soften the crossing dividers */
+.q-pastor{-webkit-mask-image:linear-gradient(to bottom,#000 60%,transparent 98%);mask-image:linear-gradient(to bottom,#000 60%,transparent 98%)}
+.quote .cd-cell{border-color:rgba(255,242,216,.22)}
