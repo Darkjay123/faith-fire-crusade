@@ -11,7 +11,7 @@ export const metadata = {
   description:
     "The 9th edition of the Faith & Fire Crusade, DELSU Prays. December 6 to 8, 2026, 4:30 PM daily at the Crusade Ground, Abraka, Delta State. Free entry.",
   alternates: { canonical: SITE.url },
-  icons: { icon: "/favicon.svg" },
+  icons: { icon: "/favicon.png" },
   openGraph: {
     title: SITE.name + " — DELSU Prays",
     description: "The 9th edition · December 6 to 8, 2026 · 4:30 PM daily · Abraka, Delta State · Free entry",

@@ -549,3 +549,7 @@ address{font-style:normal;color:rgba(255,242,216,.85);font-size:14.5px;line-heig
   .g-hbtn { padding: 7px 9px; font-size: 9px; }
   .g-head { gap: 5px; }
 }
+
+/* real assets pass */
+.h1img{line-height:0}
+.hmark{width:min(640px,88vw);height:auto;display:block;margin:2px auto 10px;filter:drop-shadow(0 12px 44px rgba(255,106,22,.38))}

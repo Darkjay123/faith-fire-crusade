@@ -181,7 +181,7 @@ export default function Experience() {
       <div id="progress" className="progress" />
 
       <div id="gate" className="gate">
-        <img src="img/logo_mark.jpg" alt="The Watchmen Prayer Network International" />
+        <img src="img/watchmen-mark.png" alt="The Watchmen Prayer Network International" />
         <div className="gname">The Watchmen Prayer Network Int&rsquo;l</div>
         <div className="gbar"><i /></div>
         <div className="gtag">Raising a people of the Word, the Spirit, and Prayer</div>
@@ -189,7 +189,7 @@ export default function Experience() {
 
       <header id="hd" className="header">
         <a className="brand" href="#top">
-          <img src="img/logo_mark.jpg" alt="Watchmen logo" />
+          <img src="img/watchmen-mark.png" alt="Watchmen logo" />
           <span className="t"><b>Faith &amp; Fire &rsquo;26</b>The Watchmen Prayer Network</span>
         </a>
         <nav className="nav" aria-label="Main">
@@ -222,7 +222,7 @@ export default function Experience() {
         <canvas id="embers" className="embers" aria-hidden="true" />
         <div className="hin">
           <span className="eyebrow"><span className="dot" />&nbsp;The 9th Edition &middot; December&nbsp;2026</span>
-          <h1 className="h1a">Faith <span className="amp">&amp;</span> Fire</h1>
+          <h1 className="h1a h1img"><img src="img/ffc_wordmark.png" alt="Faith &amp; Fire Crusade" className="hmark" /></h1>
           <div className="h1b">Crusade &middot; DELSU Prays &middot; The 9th Edition</div>
           <div className="hwhen">
             <div className="chip"><b>Sun 6 Dec</b>Opening Night</div>
@@ -271,7 +271,7 @@ export default function Experience() {
             <button type="submit">Reserve my seat</button>
           </form>
           <div id="regok" className="regok">
-            <img src="img/logo_mark.jpg" alt="" />
+            <img src="img/watchmen-mark.png" alt="" />
             <h3>Your seat is lit.</h3>
             <p>Reservation noted on this device. To make sure the team&rsquo;s desk has it, send it over in one tap:</p>
             <a id="regwa" className="ibtn solid" style={{ display: "inline-block", width: "auto", padding: "14px 28px", marginTop: 14 }} target="_blank" rel="noopener" rel="noopener noreferrer">Send on WhatsApp</a>
@@ -393,7 +393,7 @@ export default function Experience() {
       </section>
 
       <div className="quote" style={{ minHeight: "60vh" }}>
-        <div className="bg" style={{ backgroundImage: "url(img/crowd_laser.jpg)" }} />
+        <div className="bg" style={{ backgroundImage: "url(img/crowd_glow.jpg)" }} />
         <div className="qin reveal">
           <p className="eyebrow">Counting down to the fire</p>
           <div id="cd2" className="cdown" style={{ marginTop: 30 }} />
@@ -401,7 +401,7 @@ export default function Experience() {
       </div>
 
       <footer className="footer">
-        <img src="img/logo_mark.jpg" alt="The Watchmen Prayer Network International logo" />
+        <img src="img/watchmen-mark.png" alt="The Watchmen Prayer Network International logo" />
         <div className="fm">The Watchmen Prayer Network Int&rsquo;l</div>
         <p className="verse">&ldquo;Raising a people of the Word, the Spirit, and Prayer&rdquo; &mdash; Ezekiel 33:7</p>
         <p className="meta">
